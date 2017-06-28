@@ -1,0 +1,154 @@
+\documentclass {article}
+\usepackage{fullpage}
+
+\begin{document}
+
+~\vfill
+\begin{center}
+\Large
+
+A5 Project Proposal
+
+Title: Ray Tracing Project
+
+Name: Cheng Dong
+
+Student ID: 20518392
+
+User ID: c9dong
+\end{center}
+\vfill ~\vfill~
+\newpage
+\noindent{\Large \bf Final Project:}
+\begin{description}
+\item[Purpose]:\\
+  To learn and implement a set of ray tracing algorithms, and tie them together in a final scene.
+
+\item[Statement]:\\
+  For this ray tracing project, I will use the algorithms mentioned in my objectives, as well as a few bonus objectives to create multiple scenes. To demonstrate individual objectives, I will compile simple scenes. For example, to demonstrate refraction, I will compile a scene with 2 spheres, and a complex background to demostrate rays bending through the sphere.
+
+  For the final scene, I will demonstrate most of my objectives, such as refraction, texture mapping, bump mapping, etc, and use them to create a complex scene. The scene is a small room with primitives, CSG solids, and meshes in the middle of the room. The walls would be texture mapped so that it can be used to demonstrate the effects of refraction. Texture and bump mapping would be applied to some primitives in the room to represent real world objects such as a globe. Finally, there will be an area light source at the top of the room to generate soft shadows around each object.
+
+  The project will be challenging because of the numerous ray tracing algorithms that I need to implement. Some of these algorithms, like refraction, texture/bump mapping, are taught in class, while other techniques will require learning on my own. Another challenging aspect of this project would be to produce a final scene. This final scene needs to be able to demonstrate most of the technique I implemented, as well as be creative and polished.
+
+  From this project, I will learn many different ray tracing algorithms, and being able to apply them in actual images.
+
+\item[Technical Outline]:\\
+    {\bf Primitives: }
+    For this objective, I will implement 2 new primitives of my choosing to display in my scene. The 2 new primitives will be cylinder and cone.[1]
+
+    {\bf Refraction: }
+    For this objective, I will implement ggRefraction taught in class and display the result in a simple scene consisting of spheres and a background.[2]
+
+    {\bf Texture Mapping: }
+    For this objective, I will implement texture mapping that was taught in class. To display the result, I will show a simple scene with a textured primitive.[3]
+
+    {\bf Bump Mapping: }
+    For this objective, I will implement bump mapping that was taught in class. To display the result, I will show a simple scene with a bump mapped primitive. To demonstrate that this is actually bump mapping, I will display the image with light source from 2 different directions.
+
+    {\bf Anti Aliasing: }
+    For this objective, I will implement anti aliasing using supersampling.[4] To show the result, I will render 2 images, one with anti aliasing, and one without, to show the differences in image quality.
+
+    {\bf Soft Shadows: }
+    For this objective, I will implement soft shadows by using an area lighting instead of a point light.[5] To demonstrate the result, I will show 2 images using both regular shadowing techniques and soft shadow techniques to demonstrate the difference.
+
+    {\bf Constructive Solid Geometry: }
+    For this objective, I will implement CSG using a CSG tree,  building on top of the hierarchical ray tracing model used in A4.[6] In addition, I will support union, difference, and intersection operations. To demonstrate the result, I will create a scene using 3 CSG solids each showing one operation.
+
+    {\bf Depth of Field: }
+    For this objective, I will implement depth of field by using a lens eye instead of a pinhole eye.[7] The lens eye will be represented by 2 parametes, focal length, and aperture. To demonstrate the result, I will render 2 images with and without depth of field to show the difference.
+
+    {\bf Grid Acceleration: }
+    For this objective, I will implement grid acceleration to speed up the image processing time.[8] To demonstrate the result, I will generate the same images with and without using Grid Acceleration, as well as using different grid resolutions. The image would include complex meshes that will take a long time to generate. The final data will be displayed on a scatter plot with number of objects VS time. 
+
+    {\bf Final Scene: }
+    For this objective, I will generate a complex scene showing all the primitives (sphere, box, cylinder, cone), as well as CSG shapes. In addition, I will include refraction, texture mapping, bump mapping, anti aliasing, and soft shadows in my scene. The details of the scene is the same as described in the Statement.
+
+\item[Bibliography]:\\
+    \begin{enumerate}
+    \item
+    \begin{verbatim}
+    Dodgson, Neil, and Alan Blackwell. Ray tracing primitives. 
+    University of Cambridge, n.d. Web. 26 June 2017.
+    Url: https://www.cl.cam.ac.uk/teaching/1999/AGraphHCI/SMAG/node2.html#SECTION00023400000000000000
+    \end{verbatim}
+    \item
+    \begin{verbatim}
+    Introduction to Shading (Reflection, Refraction and Fresnel).
+     N.p., 15 Aug. 2014. Web. 26 June 2017.
+    Url: https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel
+    \end{verbatim}
+    \item
+    \begin{verbatim}
+    Levoy, Marc. Texture mapping (part I). Stanford University, 
+    n.d. Web. 26 June 2017.
+    Url: https://graphics.stanford.edu/courses/cs348b-96/texturing/texturing1.html
+    \end{verbatim}
+    \item
+    \begin{verbatim}
+    Cooksey, Chris. Antialiasing and Raytracing. N.p., 
+    Jan. 1994. Web. 26 June 2017. 
+    Url: http://paulbourke.net/miscellaneous/aliasing/
+    \end{verbatim}
+    \item
+    \begin{verbatim}
+    Fernando, Randima. Percentage-Closer Soft Shadows. 
+    NVIDIA Corporation.
+    Url: http://developer.download.nvidia.com/shaderlibrary/docs/shadow_PCSS.pdf
+    \end{verbatim}
+    \item
+    \begin{verbatim}
+    Hijazi, Younis. Knoll, Aaron. Schott, Mathias. Kensler,
+     Andrew. Hansen, Charles. Hagen, Hans. CSG Operations of
+      Arbitrary Primitives with Interval Arithmetic and Real-
+      Time Ray Tracing. SCI Institute. 19, Nov, 2008.
+    Url: https://www.cs.utah.edu/~aek/research/csgimplicits.pdf
+    \end{verbatim}
+    \item
+    \begin{verbatim}
+    Harvey, Steve. Ray Tracer Part Six – Depth Of Field. 
+    A FEW SMALL PROGRAMMING PROJECTS. N.p., 29 Sept. 2016. 
+    Web. 26 June 2017.
+    Url: https://steveharveynz.wordpress.com/2012/12/21/ray-tracer-part-5-depth-of-field/
+    \end{verbatim}
+    \item
+    \begin{verbatim}
+    Introduction to Acceleration Structures (Grid). 
+    N.p., 08 Oct. 2015. Web. 26 June 2017.
+    Url: https://www.scratchapixel.com/lessons/advanced-rendering/introduction-acceleration-structure/grid
+    \end{verbatim}
+    \end{enumerate}
+
+\end{description}
+\newpage
+
+
+\noindent{\Large\bf Objectives:}
+
+{\hfill{\bf Full UserID: c9dong}\hfill{\bf Student ID: 20518392}\hfill}
+
+\begin{enumerate}
+     \item[\_\_\_ 1:]  Primitives
+
+     \item[\_\_\_ 2:]  Refraction
+
+     \item[\_\_\_ 3:]  Texture Mapping
+
+     \item[\_\_\_ 4:]  Bump Mapping
+
+     \item[\_\_\_ 5:]  Final Scene
+
+     \item[\_\_\_ 6:]  Anti Aliasing
+
+     \item[\_\_\_ 7:]  Soft Shadows
+
+     \item[\_\_\_ 8:]  Constructive Solid Geometry
+
+     \item[\_\_\_ 9:]  Depth of Field
+
+     \item[\_\_\_ 10:]  Grid Acceleration
+\end{enumerate}
+
+% Delete % at start of next line if this is a ray tracing project
+% A4 extra objective:
+\end{document}
