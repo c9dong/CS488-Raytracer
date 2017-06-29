@@ -1,6 +1,7 @@
 #include "SceneNode.hpp"
 
 #include "cs488-framework/MathUtils.hpp"
+#include "PhongMaterial.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -113,12 +114,22 @@ int SceneNode::totalSceneNodes() const {
 
 Intersection SceneNode::intersect(Ray &ray, bool checkBound) {
 	Intersection minIntersection;
+	vec3 inv_origin = vec3(invtrans * vec4(ray.origin, 1));
+	vec3 inv_direction = glm::normalize(vec3(invtrans * vec4(ray.direction, 0)));
+	Ray inverseRay(inv_origin, inv_direction);
 	for (SceneNode *child : children) {
-		Intersection i = child->intersect(ray, checkBound);
+		Intersection i = child->intersect(inverseRay, checkBound);
 		if (i.hit && i.pDist < minIntersection.pDist) {
 			minIntersection = i;
 		}
 	}
+
+	if (minIntersection.hit) {
+		minIntersection.pHit = vec3(trans * vec4(minIntersection.pHit, 1));
+		minIntersection.pNormal = 
+			glm::normalize(glm::transpose((mat3(invtrans))) * minIntersection.pNormal);
+	}
+
 	return minIntersection;
 }
 

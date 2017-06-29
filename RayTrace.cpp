@@ -47,6 +47,7 @@ void RayTrace::generateImage() {
 
   for (uint y = 0; y < h; ++y) {
     for (uint x = 0; x < w; ++x) {
+      // if (!(y > 150 && y < 155)) continue;
       // cout << "...................." << endl;
       if (x == 100 && y == 100) print = true;
       vec4 p_world = p_to_world * vec4(float(x), float(y), 0.0f, 1.0f);
@@ -54,13 +55,6 @@ void RayTrace::generateImage() {
       vec3 r_origin = vec3(eye);
       vec3 r_direction = vec3(p_world) - r_origin;
       Ray ray(r_origin, r_direction);
-      // vec3 background;
-      // cout << p_world.x << " " << p_world.y << " " << p_world.z << " " << p_world[3] << endl;
-      // if (isZero(p_world.x + p_world.y)) {
-      //   background = vec3(1,0,0);
-      // } else {
-        // vec3 background = vec3(0, 0, float(y) / float(h));
-      // }
 
       double latitude = sin(r_direction[1]);  // -pi/2 to pi/2
       // scale to 0 to 1

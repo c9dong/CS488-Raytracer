@@ -1,6 +1,9 @@
 #include "GeometryNode.hpp"
 #include "Intersection.hpp"
 
+using namespace glm;
+using namespace std;
+
 //---------------------------------------------------------------------------------------
 GeometryNode::GeometryNode(
 	const std::string & name, Primitive *prim, Material *mat )
@@ -28,9 +31,18 @@ void GeometryNode::setMaterial( Material *mat )
 }
 
 Intersection GeometryNode::intersect(Ray &ray, bool checkBound) {
-	Intersection intersect = m_primitive->intersect(ray, checkBound);
+	vec3 inv_origin = vec3(invtrans * vec4(ray.origin, 1));
+	vec3 inv_direction = glm::normalize(vec3(invtrans * vec4(ray.direction, 0)));
+	Ray inverseRay(inv_origin, inv_direction);
+
+	Intersection intersect = m_primitive->intersect(inverseRay, checkBound);
+
 	if (intersect.hit) {
 		intersect.mat = m_material;
+		intersect.pHit = vec3(trans * vec4(intersect.pHit, 1));
+		intersect.pNormal = 
+			glm::normalize(glm::transpose((mat3(invtrans))) * intersect.pNormal);
+		intersect.pDist = glm::distance(intersect.pHit, ray.origin);
 	}
 	return intersect;
 }

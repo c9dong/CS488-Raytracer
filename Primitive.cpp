@@ -95,10 +95,11 @@ Intersection NonhierBox::intersect(Ray &ray, bool checkBound) {
 
   float tmin = (bound_min.x - a.x) / d.x;
   float tmax = (bound_max.x - a.x) / d.x;
-  if (d.x == 0) {
-    tmin = -INFINITY;
-    tmax = -INFINITY;
-  }
+
+  // if (d.x == 0) {
+  //   tmin = INFINITY;
+  //   tmax = INFINITY;
+  // }
 
   if (tmin > tmax) {
     normal.x = 1;
@@ -110,10 +111,10 @@ Intersection NonhierBox::intersect(Ray &ray, bool checkBound) {
   float tymin = (bound_min.y - a.y) / d.y;
   float tymax = (bound_max.y - a.y) / d.y;
 
-  if (d.y == 0) {
-    tymin = -INFINITY;
-    tymax = -INFINITY;
-  }
+  // if (d.y == 0) {
+  //   tymin = -INFINITY;
+  //   tymax = -INFINITY;
+  // }
 
   if (tymin > tymax) {
     normal.y = 1;
@@ -140,10 +141,10 @@ Intersection NonhierBox::intersect(Ray &ray, bool checkBound) {
   float tzmin = (bound_min.z - a.z) / d.z;
   float tzmax = (bound_max.z - a.z) / d.z;
 
-  if (d.z == 0) {
-    tzmin = -INFINITY;
-    tzmax = -INFINITY;
-  }
+  // if (d.z == 0) {
+  //   tzmin = -INFINITY;
+  //   tzmax = -INFINITY;
+  // }
 
   if (tzmin > tzmax) {
     normal.z = 1;
