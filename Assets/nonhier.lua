@@ -7,6 +7,14 @@ mat4 = gr.material({1.0, 0.6, 0.0}, {0.5, 0.4, 0.8}, 50)
 
 scene_root = gr.node('root')
 
+s1 = gr.nh_sphere('s1', {0, 0, -400}, 100)
+scene_root:add_child(s1)
+s1:set_material(mat1)
+
+s2 = gr.nh_sphere('s2', {-300, 0, -400}, 150)
+scene_root:add_child(s2)
+s2:set_material(mat1)
+
 -- s1 = gr.nh_sphere('s1', {0, 0, -400}, 100)
 -- scene_root:add_child(s1)
 -- s1:set_material(mat1)
@@ -19,21 +27,21 @@ scene_root = gr.node('root')
 -- scene_root:add_child(s2)
 -- s2:set_material(mat1)
 
-c3 = gr.nh_cone('c3', {-200, 150, -200}, 100, 300)
-scene_root:add_child(c3)
-c3:set_material(mat3)
+-- c3 = gr.nh_cone('c3', {-200, 150, -200}, 100, 300)
+-- scene_root:add_child(c3)
+-- c3:set_material(mat3)
 
-s1 = gr.nh_sphere('s1', {-200, 150, -200}, 120)
-scene_root:add_child(s1)
-s1:set_material(mat3)
+-- s1 = gr.nh_sphere('s1', {-200, 150, -200}, 120)
+-- scene_root:add_child(s1)
+-- s1:set_material(mat3)
 
 -- s3 = gr.nh_sphere('s3', {0, -1200, -200}, 1000)
 -- scene_root:add_child(s3)
 -- s3:set_material(mat2)
 
-s2 = gr.nh_sphere('s2', {-200, 30, -200}, 100)
-scene_root:add_child(s2)
-s2:set_material(mat3)
+-- s2 = gr.nh_sphere('s2', {-200, 30, -200}, 100)
+-- scene_root:add_child(s2)
+-- s2:set_material(mat3)
 
 -- s3 = gr.nh_sphere('s3', {0, -1200, -500}, 1000)
 -- scene_root:add_child(s3)

@@ -8,21 +8,21 @@
 class Primitive {
 public:
   virtual ~Primitive();
-  virtual Intersection intersect(Ray &ray, bool checkBound);
+  virtual Intersection::Range* intersect(Ray &ray, bool checkBound);
 };
 
 class Sphere : public Primitive {
 public:
   virtual ~Sphere();
 
-  Intersection intersect(Ray &ray, bool checkBound);
+  Intersection::Range* intersect(Ray &ray, bool checkBound);
 };
 
 class Cube : public Primitive {
 public:
   virtual ~Cube();
 
-  Intersection intersect(Ray &ray, bool checkBound);
+  Intersection::Range* intersect(Ray &ray, bool checkBound);
 };
 
 class NonhierSphere : public Primitive {
@@ -33,7 +33,7 @@ public:
   }
   virtual ~NonhierSphere();
 
-  Intersection intersect(Ray &ray, bool checkBound);
+  Intersection::Range* intersect(Ray &ray, bool checkBound);
 
 private:
   glm::vec3 m_pos;
@@ -49,9 +49,11 @@ public:
   
   virtual ~NonhierBox();
 
-  Intersection intersect(Ray &ray, bool checkBound);
+  Intersection::Range* intersect(Ray &ray, bool checkBound);
 
 private:
+  glm::vec3 getNormal(glm::vec3 pHit, glm::vec3 bound_min, glm::vec3 bound_max);
+
   glm::vec3 m_pos;
   double m_size;
 };
@@ -65,7 +67,7 @@ public:
 
   virtual ~NonhierCylinder();
 
-  Intersection intersect(Ray &ray, bool checkBound);
+  Intersection::Range* intersect(Ray &ray, bool checkBound);
 private:
   glm::vec3 m_pos;
   double m_radius;
@@ -81,7 +83,7 @@ public:
 
   virtual ~NonhierCone();
 
-  Intersection intersect(Ray &ray, bool checkBound);
+  Intersection::Range* intersect(Ray &ray, bool checkBound);
 private:
   glm::vec3 m_pos;
   double m_radius;

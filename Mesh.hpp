@@ -26,7 +26,7 @@ class Mesh : public Primitive {
 public:
   Mesh( const std::string& fname );
   
-  Intersection intersect(Ray &ray, bool checkBound);
+  Intersection::Range* intersect(Ray &ray, bool checkBound);
 private:
 	std::vector<glm::vec3> m_vertices;
 	std::vector<Triangle> m_faces;

@@ -14,7 +14,10 @@
 enum class NodeType {
 	SceneNode,
 	GeometryNode,
-	JointNode
+	JointNode,
+    UnionNode,
+    IntersectNode,
+    DifferenceNode
 };
 
 class SceneNode {

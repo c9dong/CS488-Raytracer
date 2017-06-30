@@ -10,7 +10,7 @@
 using namespace glm;
 using namespace std;
 
-#define SHADOW
+// #define SHADOW
 // #define REFLECTION
 // #define REFRACTION
 
@@ -101,25 +101,29 @@ mat4 RayTrace::getPointToWorldMatrix() {
 glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit) {
   Intersection intersection = root->intersect(ray, false);
   vec3 col;
-  if (intersection.hit) {
+  Intersection::Hit hit = intersection.getFirstHit(ray);
+  if (hit.hit) {
     col = ambient;
     for(Light * light : lights) {
       Intersection shadowIntersection;
       // check shadow
       #ifdef SHADOW
-      vec3 shadow_origin = intersection.pHit + intersection.pNormal*0.1f;
+      vec3 shadow_origin = hit.pHit + hit.pNormal*0.1f;
       vec3 shadow_direction = (light->position - shadow_origin);
       Ray shadowRay(shadow_origin, shadow_direction);
       shadowIntersection = root->intersect(shadowRay, true);
-      #endif
-      if (!shadowIntersection.hit) {
-        col += intersection.mat->getColor(intersection.pHit, intersection.pNormal, light);
+      if (!shadowIntersection.getFirstHit(shadowRay).hit) {
+        col += hit.mat->getColor(hit.pHit, hit.pNormal, light);
       }
+      #endif
+      #ifndef SHADOW
+      col += hit.mat->getColor(hit.pHit, hit.pNormal, light);
+      #endif
     }
 
     // reflection
     PhongMaterial *pMat;
-    if ((pMat = dynamic_cast<PhongMaterial*>(intersection.mat))) {
+    if ((pMat = dynamic_cast<PhongMaterial*>(hit.mat))) {
       #ifdef REFLECTION
       if (!isZero(pMat->m_shininess) && maxHit < 10) {
         maxHit ++;

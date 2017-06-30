@@ -35,14 +35,17 @@ Intersection GeometryNode::intersect(Ray &ray, bool checkBound) {
 	vec3 inv_direction = glm::normalize(vec3(invtrans * vec4(ray.direction, 0)));
 	Ray inverseRay(inv_origin, inv_direction);
 
-	Intersection intersect = m_primitive->intersect(inverseRay, checkBound);
+	Intersection::Range *range = m_primitive->intersect(inverseRay, checkBound);
 
-	if (intersect.hit) {
-		intersect.mat = m_material;
-		intersect.pHit = vec3(trans * vec4(intersect.pHit, 1));
-		intersect.pNormal = 
-			glm::normalize(glm::transpose((mat3(invtrans))) * intersect.pNormal);
-		intersect.pDist = glm::distance(intersect.pHit, ray.origin);
+	Intersection i;
+	if (range->hit) {
+		range->s_mat = m_material;
+		range->e_mat = m_material;
+
+		i.addRange(range);
 	}
-	return intersect;
+
+	i.transformRanges(ray, inverseRay, trans, invtrans);
+
+	return i;
 }

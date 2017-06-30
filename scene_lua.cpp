@@ -54,6 +54,9 @@
 #include "Material.hpp"
 #include "PhongMaterial.hpp"
 #include "A4.hpp"
+#include "UnionNode.hpp"
+#include "IntersectNode.hpp"
+#include "DifferenceNode.hpp"
 
 typedef std::map<std::string,Mesh*> MeshMap;
 static MeshMap mesh_map;
@@ -124,6 +127,57 @@ int gr_node_cmd(lua_State* L)
 
   const char* name = luaL_checkstring(L, 1);
   data->node = new SceneNode(name);
+
+  luaL_getmetatable(L, "gr.node");
+  lua_setmetatable(L, -2);
+
+  return 1;
+}
+
+extern "C"
+int gr_union_cmd(lua_State* L)
+{
+  GRLUA_DEBUG_CALL;
+  
+  gr_node_ud* data = (gr_node_ud*)lua_newuserdata(L, sizeof(gr_node_ud));
+  data->node = 0;
+
+  const char* name = luaL_checkstring(L, 1);
+  data->node = new UnionNode(name);
+
+  luaL_getmetatable(L, "gr.node");
+  lua_setmetatable(L, -2);
+
+  return 1;
+}
+
+extern "C"
+int gr_intersect_cmd(lua_State* L)
+{
+  GRLUA_DEBUG_CALL;
+  
+  gr_node_ud* data = (gr_node_ud*)lua_newuserdata(L, sizeof(gr_node_ud));
+  data->node = 0;
+
+  const char* name = luaL_checkstring(L, 1);
+  data->node = new IntersectNode(name);
+
+  luaL_getmetatable(L, "gr.node");
+  lua_setmetatable(L, -2);
+
+  return 1;
+}
+
+extern "C"
+int gr_difference_cmd(lua_State* L)
+{
+  GRLUA_DEBUG_CALL;
+  
+  gr_node_ud* data = (gr_node_ud*)lua_newuserdata(L, sizeof(gr_node_ud));
+  data->node = 0;
+
+  const char* name = luaL_checkstring(L, 1);
+  data->node = new DifferenceNode(name);
 
   luaL_getmetatable(L, "gr.node");
   lua_setmetatable(L, -2);
@@ -563,6 +617,9 @@ int gr_node_gc_cmd(lua_State* L)
 // If you want to add a new non-member function, add it here.
 static const luaL_Reg grlib_functions[] = {
   {"node", gr_node_cmd},
+  {"union", gr_union_cmd},
+  {"intersect", gr_intersect_cmd},
+  {"difference", gr_difference_cmd},
   {"sphere", gr_sphere_cmd},
   {"joint", gr_joint_cmd},
   {"material", gr_material_cmd},

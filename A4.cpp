@@ -3,6 +3,125 @@
 #include "A4.hpp"
 #include "RayTrace.hpp"
 
+using namespace std;
+using namespace glm;
+
+#define TEST
+
+#ifdef TEST
+#include "Intersection.hpp"
+
+void testUnion() {
+	cout << "Test Union" << endl;
+
+	Intersection::Point p1(1, 0, vec3(0), nullptr);
+	Intersection::Point p2(5, 1, vec3(0), nullptr);
+	Intersection::Point p3(7, 0, vec3(0), nullptr);
+	Intersection::Point p4(11, 1, vec3(0), nullptr);
+	Intersection::Point p5(5, 0, vec3(0), nullptr);
+	Intersection::Point p6(7, 1, vec3(0), nullptr);
+	Intersection::Point p7(15, 0, vec3(0), nullptr);
+	Intersection::Point p8(17, 1, vec3(0), nullptr);
+
+	Intersection::Range *r1 = new Intersection::Range(p1, p2);
+	Intersection::Range *r2 = new Intersection::Range(p3, p4);
+	Intersection::Range *r3 = new Intersection::Range(p5, p6);
+	Intersection::Range *r4 = new Intersection::Range(p7, p8);
+
+	Intersection i1;
+	Intersection i2;
+	i1.addRange(r1);
+	i1.addRange(r2);
+
+	i2.addRange(r3);
+	i2.addRange(r4);
+
+	Intersection i3 = i1.union_intersection(i2);
+	assert(i3.ranges.size() == 2);
+	assert(i3.ranges[0]->start == 1);
+	assert(i3.ranges[0]->end == 11);
+	assert(i3.ranges[1]->start == 15);
+	assert(i3.ranges[1]->end == 17);
+
+	cout << "Test Union success" << endl;
+}
+
+void testIntersection() {
+	cout << "Test Intersection" << endl;
+
+	Intersection::Point p1(1, 0, vec3(0), nullptr);
+	Intersection::Point p2(5, 1, vec3(0), nullptr);
+	Intersection::Point p3(7, 0, vec3(0), nullptr);
+	Intersection::Point p4(11, 1, vec3(0), nullptr);
+	Intersection::Point p5(5, 0, vec3(0), nullptr);
+	Intersection::Point p6(7, 1, vec3(0), nullptr);
+	Intersection::Point p7(15, 0, vec3(0), nullptr);
+	Intersection::Point p8(17, 1, vec3(0), nullptr);
+
+	Intersection::Range *r1 = new Intersection::Range(p1, p2);
+	Intersection::Range *r2 = new Intersection::Range(p3, p4);
+	Intersection::Range *r3 = new Intersection::Range(p5, p6);
+	Intersection::Range *r4 = new Intersection::Range(p7, p8);
+
+	Intersection i1;
+	Intersection i2;
+	i1.addRange(r1);
+	i1.addRange(r2);
+
+	i2.addRange(r3);
+	i2.addRange(r4);
+
+	Intersection i3 = i1.intersect_intersection(i2);
+	assert(i3.ranges.size() == 2);
+	assert(i3.ranges[0]->start == 5);
+	assert(i3.ranges[0]->end == 5);
+	assert(i3.ranges[1]->start == 7);
+	assert(i3.ranges[1]->end == 7);
+
+	cout << "Test Intersection success" << endl;
+}
+
+void testDifference() {
+	cout << "Test Difference" << endl;
+
+	Intersection::Point p1(1, 0, vec3(0), nullptr);
+	Intersection::Point p2(5, 1, vec3(0), nullptr);
+	Intersection::Point p3(7, 0, vec3(0), nullptr);
+	Intersection::Point p4(11, 1, vec3(0), nullptr);
+	Intersection::Point p5(3, 0, vec3(0), nullptr);
+	Intersection::Point p6(9, 1, vec3(0), nullptr);
+	Intersection::Point p7(15, 0, vec3(0), nullptr);
+	Intersection::Point p8(17, 1, vec3(0), nullptr);
+
+	Intersection::Range *r1 = new Intersection::Range(p1, p2);
+	Intersection::Range *r2 = new Intersection::Range(p3, p4);
+	Intersection::Range *r3 = new Intersection::Range(p5, p6);
+	Intersection::Range *r4 = new Intersection::Range(p7, p8);
+
+	Intersection i1;
+	Intersection i2;
+	i1.addRange(r1);
+	i1.addRange(r2);
+
+	i2.addRange(r3);
+	i2.addRange(r4);
+
+	Intersection i3 = i1.difference_intersection(i2);
+	cout << i3.ranges[0]->start << endl;
+	cout << i3.ranges[0]->end << endl;
+	cout << i3.ranges[1]->start << endl;
+	cout << i3.ranges[1]->end << endl;
+	assert(i3.ranges.size() == 2);
+	assert(i3.ranges[0]->start == 1);
+	assert(i3.ranges[0]->end == 3);
+	assert(i3.ranges[1]->start == 9);
+	assert(i3.ranges[1]->end == 11);
+
+	cout << "Test Difference success" << endl;
+}
+
+#endif
+
 void A4_Render(
 		// What to render
 		SceneNode * root,
@@ -20,6 +139,12 @@ void A4_Render(
 		const glm::vec3 & ambient,
 		const std::list<Light *> & lights
 ) {
+
+	#ifdef TEST
+	testUnion();
+	testIntersection();
+	testDifference();
+	#endif
 
   // Fill in raytracing code here...
 
