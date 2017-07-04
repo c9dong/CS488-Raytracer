@@ -8,10 +8,11 @@ mat1 = gr.material({0.7, 1.0, 0.7}, {0.5, 0.7, 0.5}, 25)
 mat2 = gr.material({0.5, 0.5, 0.5}, {0.5, 0.7, 0.5}, 25)
 mat3 = gr.material({1.0, 0.6, 0.1}, {0.5, 0.7, 0.5}, 25)
 mat4 = gr.material({0.7, 0.6, 1.0}, {0.5, 0.4, 0.8}, 25)
-mat5 = gr.texture('Assets/basketball.png')
+mat5 = gr.cube_texture('Assets/basketball.png')
+mat6 = gr.sphere_texture('Assets/world.png')
 
 scene = gr.node( 'scene' )
-scene:translate(10, 0, -15)
+scene:translate(0, 0, -15)
 
 -- u = gr.union('union')
 -- scene:add_child(u)
@@ -23,9 +24,11 @@ s1:set_material(mat5)
 s1:scale(2, 3, 1);
 s1:translate(-5, -5, 0);
 
--- s2 = gr.nh_sphere('s2', {0, 0, -0}, 100)
--- u:add_child(s2)
--- s2:set_material(mat1)
+s2 = gr.sphere('s2')
+scene:add_child(s2)
+s2:set_material(mat6)
+-- s2:scale(2, 3, 1);
+s2:translate(-5, 3, 0);
 
 -- i = gr.intersect('intersect')
 -- scene:add_child(i)
