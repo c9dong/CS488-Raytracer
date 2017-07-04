@@ -113,11 +113,11 @@ glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit) {
       Ray shadowRay(shadow_origin, shadow_direction);
       shadowIntersection = root->intersect(shadowRay, true);
       if (!shadowIntersection.getFirstHit(shadowRay).hit) {
-        col += hit.mat->getColor(hit.pHit, hit.pNormal, light);
+        col += hit.mat->getColor(hit.pHit, hit.pNormal, light, hit.inv);
       }
       #endif
       #ifndef SHADOW
-      col += hit.mat->getColor(hit.pHit, hit.pNormal, light);
+      col += hit.mat->getColor(hit.pHit, hit.pNormal, light, hit.inv);
       #endif
     }
 

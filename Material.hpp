@@ -10,7 +10,8 @@ public:
 
   virtual glm::vec3 getColor(glm::vec3 pHit, 
     glm::vec3 pNormal, 
-    Light *light);
+    Light *light,
+    glm::mat4 inv);
 protected:
   Material();
 };

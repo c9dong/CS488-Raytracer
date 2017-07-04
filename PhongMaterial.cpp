@@ -9,6 +9,8 @@
 using namespace glm;
 using namespace std;
 
+PhongMaterial::PhongMaterial() {}
+
 PhongMaterial::PhongMaterial(
 	const glm::vec3& kd, const glm::vec3& ks, double shininess )
 	: m_kd(kd)
@@ -21,7 +23,8 @@ PhongMaterial::~PhongMaterial()
 
 glm::vec3 PhongMaterial::getColor(glm::vec3 pHit, 
     glm::vec3 pNormal, 
-    Light *light) {
+    Light *light,
+    glm::mat4 inv) {
 
   vec3 l = normalize(light->position - vec3(pHit));
 
@@ -43,6 +46,5 @@ glm::vec3 PhongMaterial::getColor(glm::vec3 pHit,
 
   vec3 col = light->colour * (diffuse + specular);
 
-  // cout << pHit.x << " " << pNormal.x << " " << dot(vec3(pNormal), l) << endl;
   return col;
 }

@@ -6,6 +6,8 @@
 
 const uint Image::m_colorComponents = 3; // Red, blue, green
 
+using namespace std;
+
 //---------------------------------------------------------------------------------------
 Image::Image()
   : m_width(0),

@@ -41,6 +41,8 @@ Intersection GeometryNode::intersect(Ray &ray, bool checkBound) {
 	if (range->hit) {
 		range->s_mat = m_material;
 		range->e_mat = m_material;
+		range->s_inv = invtrans;
+		range->e_inv = invtrans;
 
 		i.addRange(range);
 	}

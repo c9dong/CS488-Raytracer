@@ -14,14 +14,14 @@ using namespace glm;
 void testUnion() {
 	cout << "Test Union" << endl;
 
-	Intersection::Point p1(1, 0, vec3(0), nullptr);
-	Intersection::Point p2(5, 1, vec3(0), nullptr);
-	Intersection::Point p3(7, 0, vec3(0), nullptr);
-	Intersection::Point p4(11, 1, vec3(0), nullptr);
-	Intersection::Point p5(5, 0, vec3(0), nullptr);
-	Intersection::Point p6(7, 1, vec3(0), nullptr);
-	Intersection::Point p7(15, 0, vec3(0), nullptr);
-	Intersection::Point p8(17, 1, vec3(0), nullptr);
+	Intersection::Point p1(1, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p2(5, 1, vec3(0), nullptr, mat4(1));
+	Intersection::Point p3(7, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p4(11, 1, vec3(0), nullptr, mat4(1));
+	Intersection::Point p5(5, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p6(7, 1, vec3(0), nullptr, mat4(1));
+	Intersection::Point p7(15, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p8(17, 1, vec3(0), nullptr, mat4(1));
 
 	Intersection::Range *r1 = new Intersection::Range(p1, p2);
 	Intersection::Range *r2 = new Intersection::Range(p3, p4);
@@ -49,14 +49,14 @@ void testUnion() {
 void testIntersection() {
 	cout << "Test Intersection" << endl;
 
-	Intersection::Point p1(1, 0, vec3(0), nullptr);
-	Intersection::Point p2(5, 1, vec3(0), nullptr);
-	Intersection::Point p3(7, 0, vec3(0), nullptr);
-	Intersection::Point p4(11, 1, vec3(0), nullptr);
-	Intersection::Point p5(5, 0, vec3(0), nullptr);
-	Intersection::Point p6(7, 1, vec3(0), nullptr);
-	Intersection::Point p7(15, 0, vec3(0), nullptr);
-	Intersection::Point p8(17, 1, vec3(0), nullptr);
+	Intersection::Point p1(1, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p2(5, 1, vec3(0), nullptr, mat4(1));
+	Intersection::Point p3(7, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p4(11, 1, vec3(0), nullptr, mat4(1));
+	Intersection::Point p5(5, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p6(7, 1, vec3(0), nullptr, mat4(1));
+	Intersection::Point p7(15, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p8(17, 1, vec3(0), nullptr, mat4(1));
 
 	Intersection::Range *r1 = new Intersection::Range(p1, p2);
 	Intersection::Range *r2 = new Intersection::Range(p3, p4);
@@ -84,14 +84,14 @@ void testIntersection() {
 void testDifference() {
 	cout << "Test Difference" << endl;
 
-	Intersection::Point p1(1, 0, vec3(0), nullptr);
-	Intersection::Point p2(5, 1, vec3(0), nullptr);
-	Intersection::Point p3(7, 0, vec3(0), nullptr);
-	Intersection::Point p4(11, 1, vec3(0), nullptr);
-	Intersection::Point p5(3, 0, vec3(0), nullptr);
-	Intersection::Point p6(9, 1, vec3(0), nullptr);
-	Intersection::Point p7(15, 0, vec3(0), nullptr);
-	Intersection::Point p8(17, 1, vec3(0), nullptr);
+	Intersection::Point p1(1, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p2(5, 1, vec3(0), nullptr, mat4(1));
+	Intersection::Point p3(7, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p4(11, 1, vec3(0), nullptr, mat4(1));
+	Intersection::Point p5(3, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p6(9, 1, vec3(0), nullptr, mat4(1));
+	Intersection::Point p7(15, 0, vec3(0), nullptr, mat4(1));
+	Intersection::Point p8(17, 1, vec3(0), nullptr, mat4(1));
 
 	Intersection::Range *r1 = new Intersection::Range(p1, p2);
 	Intersection::Range *r2 = new Intersection::Range(p3, p4);

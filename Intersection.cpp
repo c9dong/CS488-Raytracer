@@ -32,14 +32,14 @@ void Intersection::addRange(Range *range) {
 Intersection Intersection::intersect_intersection(Intersection &other) {
   vector<Intersection::Point*> points;
   for (Range *r : ranges) {
-    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat);
-    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat);
+    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
+    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat, r->e_inv);
     points.push_back(p1);
     points.push_back(p2);
   }
   for (Range *r : (other.ranges)) {
-    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat);
-    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat);
+    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
+    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat, r->e_inv);
     points.push_back(p1);
     points.push_back(p2);
   }
@@ -67,14 +67,14 @@ Intersection Intersection::intersect_intersection(Intersection &other) {
 Intersection Intersection::union_intersection(Intersection &other) {
   vector<Intersection::Point*> points;
   for (Range *r : ranges) {
-    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat);
-    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat);
+    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
+    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat, r->e_inv);
     points.push_back(p1);
     points.push_back(p2);
   }
   for (Range *r : (other.ranges)) {
-    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat);
-    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat);
+    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
+    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat, r->e_inv);
     points.push_back(p1);
     points.push_back(p2);
   }
@@ -104,14 +104,14 @@ Intersection Intersection::union_intersection(Intersection &other) {
 Intersection Intersection::difference_intersection(Intersection &other) {
   vector<Intersection::Point*> points;
   for (Range *r : ranges) {
-    Intersection::Point *p1 = new Point(r->start, -1, r->s_normal, r->s_mat);
-    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat);
+    Intersection::Point *p1 = new Point(r->start, -1, r->s_normal, r->s_mat, r->s_inv);
+    Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat, r->e_inv);
     points.push_back(p1);
     points.push_back(p2);
   }
   for (Range *r : (other.ranges)) {
-    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat);
-    Intersection::Point *p2 = new Point(r->end, 2, r->e_normal, r->e_mat);
+    Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
+    Intersection::Point *p2 = new Point(r->end, 2, r->e_normal, r->e_mat, r->e_inv);
     points.push_back(p1);
     points.push_back(p2);
   }
@@ -144,40 +144,6 @@ Intersection Intersection::difference_intersection(Intersection &other) {
   }
 
   return newIntersection;
-
-  // for (Range r1 : ranges) {
-  //   for (Range r2 : other.ranges) {
-  //     Range newRange;
-  //     if (r1.start <= r2.start) {
-  //       newRange.start = r1.start;
-  //       newRange.s_normal = r1.s_normal;
-  //       newRange.s_mat = r1.s_mat;
-  //       newRange.hit = true;
-  //       if (r1.end <= r2.start) {
-  //         newRange.end = r1.end;
-  //         newRange.e_normal = r1.e_normal;
-  //         newRange.e_mat = r1.e_mat;
-  //       } else {
-  //         newRange.end = r2.start;
-  //         newRange.e_normal = r1.s_normal;
-  //         newRange.e_mat = r1.s_mat;
-  //       }
-  //       newIntersection.addRange(newRange);
-  //     } else {
-  //       if (r2.end <= r1.end) {
-  //         Range newRange;
-  //         newRange.start = r2.end;
-  //         newRange.s_normal = r2.e_normal;
-  //         newRange.s_mat = r2.e_mat;
-  //         newRange.end = r1.end;
-  //         newRange.e_normal = r1.e_normal;
-  //         newRange.e_mat = r1.e_mat;
-  //         newIntersection.addRange(newRange);
-  //       }
-  //     }
-  //   }
-  // }
-  // return newIntersection;
 }
 
 void Intersection::transformRanges(Ray &ray, Ray &inv_ray, glm::mat4 trans, glm::mat4 invtrans) {
@@ -213,12 +179,13 @@ Intersection::Hit Intersection::getFirstHit(Ray &ray) {
       minT = r->start;
       minHit.pNormal = r->s_normal;
       minHit.mat = r->s_mat;
+      minHit.inv = r->s_inv;
     }
 
     if (r->end >= 0 && r->end < minT) {
       minT = r->end;
       minHit.pNormal = r->e_normal;
-      minHit.mat = r->e_mat;
+      minHit.inv = r->e_inv;
     }
   }
 

@@ -11,24 +11,27 @@ class Intersection {
 public:
   struct Point {
     Point() {};
-    Point(float value, int position, glm::vec3 normal, Material *mat) {
+    Point(float value, int position, glm::vec3 normal, Material *mat, glm::mat4 inv) {
         this->value = value;
         this->position = position;
         this->normal = normal;
         this->mat = mat;
+        this->inv = inv;
       };
-    Point(const Point &p) : value(p.value), normal(p.normal), mat(p.mat) {};
+    Point(const Point &p) : value(p.value), normal(p.normal), mat(p.mat), inv(p.inv) {};
 
     void set(Point &p) {
       value = p.value;
       position = p.position;
       normal = p.normal;
       mat = p.mat;
+      inv = p.inv;
     }
     float value = 0.0f;
     int position = 0; // 0 = start, 1 = end
     glm::vec3 normal;
     Material *mat;
+    glm::mat4 inv;
   };
 
   struct Range {
@@ -37,10 +40,12 @@ public:
       start = sp.value;
       s_normal = sp.normal;
       s_mat = sp.mat;
+      s_inv = sp.inv;
 
       end = ep.value;
       e_normal = ep.normal;
       e_mat = ep.mat;
+      e_inv = ep.inv;
 
       hit = true;
     }
@@ -51,6 +56,8 @@ public:
       e_normal(r.e_normal),
       s_mat(r.s_mat),
       e_mat(r.e_mat),
+      s_inv(r.s_inv),
+      e_inv(r.e_inv),
       hit(r.hit) {};
 
     float start;
@@ -59,6 +66,8 @@ public:
     glm::vec3 e_normal;
     Material *s_mat;
     Material *e_mat;
+    glm::mat4 s_inv;
+    glm::mat4 e_inv;
     bool hit;
   };
 
@@ -66,6 +75,7 @@ public:
     glm::vec3 pHit;
     glm::vec3 pNormal;
     Material *mat;
+    glm::mat4 inv;
     bool hit;
   };
 
