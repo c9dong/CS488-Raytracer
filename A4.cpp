@@ -2,6 +2,7 @@
 
 #include "A4.hpp"
 #include "RayTrace.hpp"
+#include "Shadow.hpp"
 
 using namespace std;
 using namespace glm;
@@ -163,7 +164,9 @@ void A4_Render(
 	}
 	std::cout << "\t}" << std::endl;
 	std:: cout <<")" << std::endl;
-
-	RayTrace raytrace(root, image, eye, view, up, fovy, ambient, lights);
+	
+	vec3 shadow_color = vec3(0.0f);
+	Shadow shadow(shadow_color);
+	RayTrace raytrace(root, image, eye, view, up, fovy, ambient, lights, shadow);
 	raytrace.generateImage();
 }

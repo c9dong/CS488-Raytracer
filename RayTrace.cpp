@@ -1,6 +1,7 @@
 #include "RayTrace.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <pthread.h>
 
 #include "Intersection.hpp"
 #include "cs488-framework/MathUtils.hpp"
@@ -10,11 +11,10 @@
 using namespace glm;
 using namespace std;
 
-// #define SHADOW
+#define NUM_THREAD_ROOT_2 4
+
 // #define REFLECTION
 // #define REFRACTION
-
-static bool print = false;
 
 RayTrace::RayTrace(
     SceneNode * root,
@@ -24,7 +24,8 @@ RayTrace::RayTrace(
     const glm::vec3 & up,
     double fovy,
     const glm::vec3 & ambient,
-    const std::list<Light *> & lights)
+    const std::list<Light *> & lights,
+    Shadow &shadow)
     : root(root), 
       image(image), 
       eye(eye),
@@ -32,12 +33,52 @@ RayTrace::RayTrace(
       up(up),
       fovy(fovy),
       ambient(ambient),
-      lights(lights)
+      lights(lights),
+      shadow(shadow)
 {
 
 }
 
 RayTrace::~RayTrace() {}
+
+void *createImagePart(void *arguments) {
+  RayTrace::GenerateArg *arg = (RayTrace::GenerateArg *)arguments;
+  int x_start = arg->x_start;
+  int x_size = arg->x_size;
+  int x_max = arg->x_max;
+  int y_start = arg->y_start;
+  int y_size = arg->y_size;
+  int y_max = arg->y_max;
+  mat4 world_mat = arg->world_mat;
+  RayTrace *raytrace = arg->raytrace;
+
+  for (int x=x_start; x<std::min(x_start+x_size, x_max); x++) {
+    for (int y=y_start; y<std::min(y_start+y_size, y_max); y++) {
+      vec4 p_world = world_mat * vec4(float(x), float(y), 0.0f, 1.0f);
+
+      vec3 r_origin = vec3(raytrace->getEye());
+      vec3 r_direction = vec3(p_world) - r_origin;
+      Ray ray(r_origin, r_direction);
+
+      vec3 background = raytrace->getBackgroundColor(ray);
+
+      vec3 col = raytrace->getRayColor(ray, background, 0);
+
+      raytrace->getImage()(x, y, 0) = col.r;
+      raytrace->getImage()(x, y, 1) = col.g;
+      raytrace->getImage()(x, y, 2) = col.b;
+    }
+  }
+  pthread_exit(NULL);
+}
+
+Image& RayTrace::getImage() {
+  return image;
+}
+
+const glm::vec3& RayTrace::getEye() {
+  return eye;
+}
 
 void RayTrace::generateImage() {
   size_t h = image.height();
@@ -45,28 +86,31 @@ void RayTrace::generateImage() {
 
   mat4 p_to_world = getPointToWorldMatrix();
 
-  for (uint y = 0; y < h; ++y) {
-    for (uint x = 0; x < w; ++x) {
-      // if (!(y > 150 && y < 155)) continue;
-      // cout << "...................." << endl;
-      if (x == 100 && y == 100) print = true;
-      vec4 p_world = p_to_world * vec4(float(x), float(y), 0.0f, 1.0f);
+  int h_size = int(ceil(float(h) / NUM_THREAD_ROOT_2));
+  int w_size = int(ceil(float(w) / NUM_THREAD_ROOT_2));
 
-      vec3 r_origin = vec3(eye);
-      vec3 r_direction = vec3(p_world) - r_origin;
-      Ray ray(r_origin, r_direction);
+  pthread_t threads[NUM_THREAD_ROOT_2 * NUM_THREAD_ROOT_2];
+  for (int i=0; i<NUM_THREAD_ROOT_2; i++) {
+    for (int j=0; j<NUM_THREAD_ROOT_2; j++) {
+      GenerateArg *args = new GenerateArg();
+      args->x_start = i * w_size;
+      args->x_size = w_size;
+      args->x_max = int(w);
+      args->y_start = j * h_size;
+      args->y_size = h_size;
+      args->y_max = int(h);
+      args->world_mat = p_to_world;
+      args->raytrace = this;
 
-      double latitude = sin(r_direction[1]);  // -pi/2 to pi/2
-      // scale to 0 to 1
-      latitude = (latitude/M_PI) + 0.5;
-      vec3 background =  getBackgroundColor(ray);
-
-      vec3 col = getRayColor(ray, background, 0);
-      image(x, y, 0) = col.r;
-      image(x, y, 1) = col.g;
-      image(x, y, 2) = col.b;
-      print = false;
+      int rc = pthread_create(&threads[i*NUM_THREAD_ROOT_2+j], NULL, createImagePart, (void *)args);
+      if (rc){
+         cout << "Error:unable to create thread," << rc << endl;
+         exit(-1);
+      }
     }
+  }
+  for (int i=0; i<NUM_THREAD_ROOT_2*NUM_THREAD_ROOT_2; i++) {
+    pthread_join(threads[i], NULL);
   }
 }
 
@@ -76,6 +120,7 @@ mat4 RayTrace::getPointToWorldMatrix() {
 
   float nx = float(w);
   float ny = float(h);
+
   float d = 1.0f;
 
   float wh = 2 * d * tan(degreesToRadians(fovy/2.0f));
@@ -104,21 +149,15 @@ glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit) {
   Intersection::Hit hit = intersection.getFirstHit(ray);
   if (hit.hit) {
     col = ambient;
-    for(Light * light : lights) {
-      Intersection shadowIntersection;
-      // check shadow
-      #ifdef SHADOW
-      vec3 shadow_origin = hit.pHit + hit.pNormal*0.1f;
-      vec3 shadow_direction = (light->position - shadow_origin);
-      Ray shadowRay(shadow_origin, shadow_direction);
-      shadowIntersection = root->intersect(shadowRay, true);
-      if (!shadowIntersection.getFirstHit(shadowRay).hit) {
-        col += hit.mat->getColor(hit.pHit, hit.pNormal, light, hit.inv);
-      }
-      #endif
-      #ifndef SHADOW
-      col += hit.mat->getColor(hit.pHit, hit.pNormal, light, hit.inv);
-      #endif
+    for(Light *light : lights) {
+      col += shadow.getColor(hit, light, root);
+      // Ray shadowRay(hit.pHit, hit.pNormal, light);
+      // Shadow::ShadowColor sc = shadow.getColor(hit, light, root);
+      // if (sc.hit) {
+      //   col += (sc.color);
+      // } else {
+      //   col += (hit.mat->getColor(hit.pHit, hit.pNormal, light, hit.inv));
+      // }
     }
 
     // reflection

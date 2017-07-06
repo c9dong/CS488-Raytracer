@@ -7,6 +7,7 @@
 // Represents a simple point light.
 struct Light {
   Light();
+  Light(const Light &light);
   
   glm::vec3 colour;
   glm::vec3 position;
