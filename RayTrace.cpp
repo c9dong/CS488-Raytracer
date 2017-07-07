@@ -6,12 +6,16 @@
 #include "Intersection.hpp"
 #include "cs488-framework/MathUtils.hpp"
 #include "Util.hpp"
+#include "Material.hpp"
 #include "PhongMaterial.hpp"
+#include "TransparentMaterial.hpp"
 
 using namespace glm;
 using namespace std;
 
-#define NUM_THREAD_ROOT_2 4
+static bool print = false;
+
+#define NUM_THREAD_ROOT_2 1
 
 // #define REFLECTION
 // #define REFRACTION
@@ -54,6 +58,7 @@ void *createImagePart(void *arguments) {
 
   for (int x=x_start; x<std::min(x_start+x_size, x_max); x++) {
     for (int y=y_start; y<std::min(y_start+y_size, y_max); y++) {
+      if (x == 80 && y == 170) print = true;
       vec4 p_world = world_mat * vec4(float(x), float(y), 0.0f, 1.0f);
 
       vec3 r_origin = vec3(raytrace->getEye());
@@ -62,11 +67,17 @@ void *createImagePart(void *arguments) {
 
       vec3 background = raytrace->getBackgroundColor(ray);
 
-      vec3 col = raytrace->getRayColor(ray, background, 0);
+      vec3 col = raytrace->getRayColor(ray, background, 0, nullptr);
 
       raytrace->getImage()(x, y, 0) = col.r;
       raytrace->getImage()(x, y, 1) = col.g;
       raytrace->getImage()(x, y, 2) = col.b;
+      if (x == 80 && y == 170) {
+        raytrace->getImage()(x, y, 0) = 0;
+        raytrace->getImage()(x, y, 1) = 0;
+        raytrace->getImage()(x, y, 2) = 0;
+      }
+      print = false;
     }
   }
   pthread_exit(NULL);
@@ -143,77 +154,147 @@ mat4 RayTrace::getPointToWorldMatrix() {
   return T2 * R * S * T1;
 }
 
-glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit) {
+// glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit, Material *lastMat) {
+//   Intersection intersection = root->intersect(ray, false);
+//   Intersection::Hit hit = intersection.getFirstHit(ray);
+//   vec3 col = getBackgroundColor(ray);
+//   if (hit.hit) {
+//     Material *mat = hit->mat;
+//     PhongMaterial *pMat;
+//     TransparentMaterial *tMat;
+//     if ((tMat = dynamic_cast<TransparentMaterial*>(hit.mat))) {
+//       if (maxHit < 10) {
+//         col = getRefractiveAndReflectiveColor();
+//       } else {
+//         return vec3(0);
+//       }
+//     } else if ((pMat = dynamic_cast<PhongMaterial*>(hit.mat))) {
+//       col = getPhongColor();
+//     } else {
+//       assert(false);
+//     }
+//   }
+// }
+
+// glm::vec3 RayTrace::getRefractiveAndReflectiveColor(Ray &ray, Intersection::Hit hit, TransparentMaterial *tMat, int maxHit) {
+//   // Refractive
+//   vec3 refractColor;
+//   float kr = 1.0f / tMat->refractIdx;
+//   vec3 origin = hit.pHit - hit.pNormal*0.1f;
+//   vec3 refract_direction = getRefractAngle(ray.direction, hit.pNormal, kr);
+//   Ray refractRay(origin, refract_direction);
+//   maxHit ++;
+//   refractColor = getRayColor(refractRay, background, maxHit);
+//   return refractColor;
+// }
+
+glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit, Material *lastMat) {
   Intersection intersection = root->intersect(ray, false);
   vec3 col;
   Intersection::Hit hit = intersection.getFirstHit(ray);
   if (hit.hit) {
     col = ambient;
-    for(Light *light : lights) {
-      col += shadow.getColor(hit, light, root);
-      // Ray shadowRay(hit.pHit, hit.pNormal, light);
-      // Shadow::ShadowColor sc = shadow.getColor(hit, light, root);
-      // if (sc.hit) {
-      //   col += (sc.color);
-      // } else {
-      //   col += (hit.mat->getColor(hit.pHit, hit.pNormal, light, hit.inv));
-      // }
+    TransparentMaterial *tMat;
+    if ((tMat = dynamic_cast<TransparentMaterial*>(hit.mat))) {
+      if (maxHit < 10) {
+        float kr = 1.0f / tMat->refractIdx;
+        vec3 origin = hit.pHit - hit.pNormal*0.1f;
+        vec3 refract_direction = getRefractAngle(ray.direction, hit.pNormal, kr);
+        Ray refractRay(origin, refract_direction);
+        Intersection internal_intersection = root->intersect(refractRay, false);
+        Intersection::Hit internalHit = internal_intersection.getFirstHit(refractRay);
+        vec3 internal_origin = internalHit.pHit - internalHit.pNormal*0.1f;
+        vec3 internal_refract_direction = getRefractAngle(refractRay.direction, internalHit.pNormal, kr);
+        Ray newRefractRay(internal_origin, internal_refract_direction);
+        int new_maxHit = maxHit + 1;
+        vec3 refractColor;
+        refractColor = getRayColor(newRefractRay, background, new_maxHit, nullptr);
+        // return refractColor;
+
+        vec3 reflect_origin = hit.pHit + hit.pNormal*0.1f;
+        vec3 reflect_direction = getReflectionAngle(ray.direction, hit.pNormal);
+        Ray reflectRay(reflect_origin, reflect_direction);
+        vec3 reflectColor;
+        reflectColor = getRayColor(reflectRay, background, new_maxHit, nullptr);
+        return refractColor * float(tMat->transmittance) + reflectColor * float(tMat->reflectivity);
+      } else {
+        cout << "dfd" << endl;
+        Ray forwardRay = Ray(hit.pHit + ray.direction*0.1f, ray.direction);
+        col = getRayColor(forwardRay, background, maxHit, tMat);
+      }
+    } else {
+      for(Light *light : lights) {
+        col += shadow.getColor(hit, light, root);
+      }
+      col = col / float(lights.size());
     }
 
     // reflection
-    PhongMaterial *pMat;
-    if ((pMat = dynamic_cast<PhongMaterial*>(hit.mat))) {
-      #ifdef REFLECTION
-      if (!isZero(pMat->m_shininess) && maxHit < 10) {
-        maxHit ++;
-        vec3 ref_origin = intersection.pHit + intersection.pNormal*0.1f;
-        vec3 ref_direction = 
-          ray.direction - 
-          2.0f * 
-          glm::normalize(intersection.pNormal) * 
-          glm::dot(glm::normalize(ray.direction), glm::normalize(intersection.pNormal));
-        Ray refRay(ref_origin, ref_direction);
-        vec3 rcol = getRayColor(refRay, background, maxHit);
-        col += float(pMat->m_shininess)/100.0f * rcol;
-      }
-      #endif
-      #ifdef REFRACTION
-      if (maxHit < 10) {
-        maxHit ++;
-        vec3 refract_angle = getRefractAngle(1.3, ray.direction, intersection.pNormal);
-        if (!isZero(refract_angle)) {
-          vec3 test_origin = intersection.pHit - intersection.pNormal*0.1f;
-          Ray testRay(test_origin, refract_angle);
-          Intersection refractIntersection = root->intersect(testRay, false);
-          assert(refractIntersection.hit);
-          vec3 refract_origin = refractIntersection.pHit + refractIntersection.pNormal*0.1f;
-          Ray refractRay(refract_origin, refract_angle);
-          // Ray refractRay(test_origin, refract_angle);
-          vec3 rcol = getRayColor(refractRay, background, maxHit);
-          col += 0.5f * rcol;
-        } else {
-          return getBackgroundColor(ray);
-        }
-      }
-      #endif
-    }
+    // PhongMaterial *pMat;
+    // if ((pMat = dynamic_cast<PhongMaterial*>(hit.mat))) {
+    //   #ifdef REFLECTION
+    //   if (pMat->m_refract != 1 && maxHit < 10) {
+    //     maxHit ++;
+    //     vec3 ref_origin = hit.pHit + hit.pNormal*0.1f;
+    //     vec3 ref_direction = 
+    //       ray.direction - 
+    //       2.0f * 
+    //       glm::normalize(hit.pNormal) * 
+    //       glm::dot(glm::normalize(ray.direction), glm::normalize(hit.pNormal));
+    //     Ray refRay(ref_origin, ref_direction);
+    //     vec3 rcol = getRayColor(refRay, background, maxHit);
+    //     col = float(1.0f-pMat->m_refract) * col + float(pMat->m_refract) * rcol;
+    //     // col += float(pMat->m_shininess)/100.0f * rcol;
+    //   }
+    //   #endif
+      // #ifdef REFRACTION
+      // if (pMat->m_refract != 1.0f && maxHit < 10) {
+      //   maxHit ++;
+      //   vec3 refract_angle = getRefractAngle(1.0f / pMat->m_refract, ray.direction, hit.pNormal);
+      //   if (!isZero(refract_angle)) {
+      //     vec3 test_origin = hit.pHit - hit.pNormal*0.1f;
+      //     // Ray testRay(test_origin, refract_angle);
+      //     // Intersection refractIntersection = root->intersect(testRay, false);
+      //     // Intersection::Hit refractHit = refractIntersection.getFirstHit(testRay);
+      //     // assert(refractHit.hit);
+      //     // vec3 refract_origin = refractHit.pHit + refractHit.pNormal*0.1f;
+      //     // Ray refractRay(refract_origin, refract_angle);
+      //     Ray refractRay(test_origin, refract_angle);
+      //     vec3 rcol = getRayColor(refractRay, background, maxHit);
+      //     col = float(1.0f-pMat->m_refract) * col + float(pMat->m_refract) * rcol;
+      //   } else {
+      //     return getBackgroundColor(ray);
+      //   }
+      // }
+      // #endif
+    // }
   } else {
     col = getBackgroundColor(ray);
   }
   return col;
 }
 
-glm::vec3 RayTrace::getRefractAngle(float kr, glm::vec3 &d, glm::vec3 &n) {
-  float d_dot_n = glm::dot(glm::normalize(d), glm::normalize(n));
+glm::vec3 RayTrace::getRefractAngle(glm::vec3 direction, glm::vec3 normal, float kr) {
+  float d_dot_n = -glm::dot(glm::normalize(direction), glm::normalize(normal));
   float root = 1.0f - kr*kr*(1.0f - d_dot_n*d_dot_n);
   if (root < 0) {
-    return vec3(0);
+    assert(false);
   }
-  vec3 res = kr * d + (-kr * d_dot_n - sqrt(root)) * n;
+  vec3 res = kr * glm::normalize(direction) + (kr * d_dot_n - sqrt(root)) * glm::normalize(normal);
   return res;
 }
 
+glm::vec3 RayTrace::getReflectionAngle(glm::vec3 direction, glm::vec3 normal) {
+  vec3 ref_direction = 
+    direction - 
+    2.0f * 
+    glm::normalize(normal) * 
+    glm::dot(glm::normalize(direction), glm::normalize(normal));
+  return ref_direction;
+}
+
 glm::vec3 RayTrace::getBackgroundColor(Ray &ray) {
+  return vec3(1.0, 0.87, 0.68);
   vec3 normal = vec3(0, -1, 0);
   vec3 p = vec3(0, -200, 0);
 

@@ -9,11 +9,12 @@
 using namespace glm;
 using namespace std;
 
-PhongMaterial::PhongMaterial() {}
+PhongMaterial::PhongMaterial() : Material() {}
 
 PhongMaterial::PhongMaterial(
-	const glm::vec3& kd, const glm::vec3& ks, double shininess )
-	: m_kd(kd)
+	const glm::vec3& kd, const glm::vec3& ks, double shininess)
+	: Material()
+  , m_kd(kd)
 	, m_ks(ks)
 	, m_shininess(shininess)
 {}
@@ -24,7 +25,8 @@ PhongMaterial::~PhongMaterial()
 glm::vec3 PhongMaterial::getColor(glm::vec3 pHit, 
     glm::vec3 pNormal, 
     Light *light,
-    glm::mat4 inv) {
+    glm::mat4 inv,
+    Material *lastMat) {
 
   vec3 l = normalize(light->position - vec3(pHit));
 

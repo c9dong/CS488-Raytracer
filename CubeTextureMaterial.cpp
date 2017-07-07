@@ -6,6 +6,7 @@
 
 #include "Intersection.hpp"
 #include "Util.hpp"
+#include "cs488-framework/MathUtils.hpp"
 
 using namespace glm;
 using namespace std;
@@ -21,12 +22,20 @@ glm::vec3 CubeTextureMaterial::getColor(glm::vec3 pHit,
     glm::mat4 inv) {
 
   pHit = vec3(inv * vec4(pHit, 1.0f));
-  float x = pHit.x;
-  float y = pHit.y;
+  float x;
+  float y;
+  if (pNormal.x == abs(1.0f)) {
+    x = -pHit.z;
+    y = pHit.y + 0.5;
+  } else if (pNormal.y == abs(1.0f)) {
+    x = -pHit.z;
+    y = pHit.x + 0.5;
+  } else {
+    x = pHit.x + 0.5;
+    y = pHit.y + 0.5;
+  }
   float u = x;
   float v = 1.0f - y;
-
-  // cout << u << " " << v << endl;
 
   float di = (width - 1.0f) * u;
   float dj = (height - 1.0f) * v;
@@ -36,7 +45,6 @@ glm::vec3 CubeTextureMaterial::getColor(glm::vec3 pHit,
 
   float up = di - i;
   float vp = dj - j;
-
 
   vec3 c00 = colorAt(i, j);
   vec3 c01 = colorAt(i, j+1);

@@ -36,3 +36,11 @@ public:
 protected:
   float m_radius;
 };
+
+class NoShadow : public Shadow {
+public:
+  NoShadow(glm::vec3 ambient);
+  virtual ~NoShadow();
+
+  glm::vec3 getColor(Intersection::Hit hit, Light *light, SceneNode *root);
+};

@@ -115,8 +115,8 @@ Intersection::Range* NonhierBox::intersect(Ray &ray, bool checkBound) {
   vec3 normal = vec3(-1, -1, -1);
 
   float r = m_size;
-  vec3 bound_min = vec3(m_pos.x, m_pos.y, m_pos.z);
-  vec3 bound_max = vec3(m_pos.x+r, m_pos.y+r, m_pos.z+r);
+  vec3 bound_min = vec3(m_pos.x-r/2, m_pos.y-r/2, m_pos.z-r/2);
+  vec3 bound_max = vec3(m_pos.x+r/2, m_pos.y+r/2, m_pos.z+r/2);
 
   float tmin = (bound_min.x - a.x) / d.x;
   float tmax = (bound_max.x - a.x) / d.x;

@@ -12,16 +12,21 @@ glm::vec3 Shadow::getColor(Intersection::Hit hit, Light *light, SceneNode *root)
   Ray shadowRay(shadow_origin, shadow_direction);
   vec3 color = ambient;
   Intersection intersect = root->intersect(shadowRay, true);
-  if (!intersect.getFirstHit(shadowRay).hit) {
-    color = hit.mat->getColor(hit.pHit, hit.pNormal, light, hit.inv);
+  Intersection::Hit shadow_hit = intersect.getFirstHit(shadowRay);
+  if (shadow_hit.hit) {
+    float light_dist = glm::distance(light->position, shadowRay.origin);
+    float hit_dist = glm::distance(shadow_hit.pHit, shadowRay.origin);
+    if (light_dist > hit_dist) {
+      return color;
+    }
   }
-  return color;
+  return hit.mat->getColor(hit.pHit, hit.pNormal, light, hit.inv, nullptr);
 }
 
 Shadow::~Shadow() {}
 
 SoftShadow::SoftShadow(glm::vec3 ambient) 
-  : Shadow(ambient), m_radius(50.0f) {}
+  : Shadow(ambient), m_radius(2.0f) {}
 
 SoftShadow::SoftShadow(glm::vec3 ambient, float radius) 
   : Shadow(ambient), m_radius(radius) {}
@@ -34,7 +39,7 @@ glm::vec3 SoftShadow::getColor(Intersection::Hit hit, Light *light, SceneNode *r
 
   float start_x = light->position.x - m_radius;
   float start_y = light->position.y - m_radius;
-  float delta = 10.0f;
+  float delta = 0.4f;
 
   float sample = (2 * m_radius / delta) * (2 * m_radius / delta);
   for (float i = start_x; i < light->position.x + m_radius; i+=delta) {
@@ -46,12 +51,30 @@ glm::vec3 SoftShadow::getColor(Intersection::Hit hit, Light *light, SceneNode *r
       new_light->position = light_pos;
 
       Intersection intersect = root->intersect(shadowRay, true);
-      if (!intersect.getFirstHit(shadowRay).hit) {
-        color += hit.mat->getColor(hit.pHit, hit.pNormal, new_light, hit.inv);
+      Intersection::Hit shadow_hit = intersect.getFirstHit(shadowRay);
+      if (shadow_hit.hit) {
+        float light_dist = glm::distance(light->position, shadowRay.origin);
+        float hit_dist = glm::distance(shadow_hit.pHit, shadowRay.origin);
+        if (light_dist > hit_dist) {
+          continue;
+        }
       }
+      color += hit.mat->getColor(hit.pHit, hit.pNormal, new_light, hit.inv, nullptr);
+      // if (!intersect.getFirstHit(shadowRay).hit) {
+      //   color += hit.mat->getColor(hit.pHit, hit.pNormal, new_light, hit.inv);
+      // }
     }
   }
   color = color / sample;
 
   return color;
 }
+
+NoShadow::NoShadow(glm::vec3 ambient) : Shadow(ambient) {}
+
+glm::vec3 NoShadow::getColor(Intersection::Hit hit, Light *light, SceneNode *root) {
+  vec3 color = hit.mat->getColor(hit.pHit, hit.pNormal, light, hit.inv, nullptr);
+  return color;
+}
+
+NoShadow::~NoShadow() {}

@@ -52,6 +52,7 @@
 #include "Primitive.hpp"
 #include "Material.hpp"
 #include "PhongMaterial.hpp"
+#include "TransparentMaterial.hpp"
 #include "CubeTextureMaterial.hpp"
 #include "SphereTextureMaterial.hpp"
 #include "A4.hpp"
@@ -452,6 +453,26 @@ int gr_material_cmd(lua_State* L)
 }
 
 extern "C"
+int gr_transparent_material_cmd(lua_State* L)
+{
+  GRLUA_DEBUG_CALL;
+  
+  gr_material_ud* data = (gr_material_ud*)lua_newuserdata(L, sizeof(gr_material_ud));
+  data->material = 0;
+
+  double transmittance = luaL_checknumber(L,1);
+  double reflectivity = luaL_checknumber(L, 2);
+  double refractIdx = luaL_checknumber(L, 3);
+  
+  data->material = new TransparentMaterial(transmittance, reflectivity, refractIdx);
+
+  luaL_newmetatable(L, "gr.material");
+  lua_setmetatable(L, -2);
+  
+  return 1;
+}
+
+extern "C"
 int gr_cube_texture_cmd(lua_State* L)
 {
   GRLUA_DEBUG_CALL;
@@ -634,6 +655,7 @@ static const luaL_Reg grlib_functions[] = {
   {"material", gr_material_cmd},
   {"cube_texture", gr_cube_texture_cmd},
   {"sphere_texture", gr_sphere_texture_cmd},
+  {"transparent_material", gr_transparent_material_cmd},
   // New for assignment 4
   {"cube", gr_cube_cmd},
   {"nh_sphere", gr_nh_sphere_cmd},

@@ -185,6 +185,7 @@ Intersection::Hit Intersection::getFirstHit(Ray &ray) {
     if (r->end >= 0 && r->end < minT) {
       minT = r->end;
       minHit.pNormal = r->e_normal;
+      minHit.mat = r->e_mat;
       minHit.inv = r->e_inv;
     }
   }

@@ -38,11 +38,12 @@ public:
   Image& getImage();
   const glm::vec3& getEye();
   glm::vec3 getBackgroundColor(Ray &ray);
-  glm::vec3 getRayColor(Ray & ray, glm::vec3 & background, int maxHit);
+  glm::vec3 getRayColor(Ray & ray, glm::vec3 & background, int maxHit, Material *lastMat);
 private:
   // Member functions
   glm::mat4 getPointToWorldMatrix();
-  glm::vec3 getRefractAngle(float kr, glm::vec3 &d, glm::vec3 &n);
+  glm::vec3 getRefractAngle(glm::vec3 direction, glm::vec3 normal, float kr);
+  glm::vec3 getReflectionAngle(glm::vec3 direction, glm::vec3 normal);
   // Member variables
   SceneNode * root;
   Image & image;
