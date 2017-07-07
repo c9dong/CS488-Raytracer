@@ -1,8 +1,8 @@
 -- Refraction testing scene
 
 red_mat = gr.material({1.0, 0.0, 0.0}, {0.5, 0.5, 0.5}, 25);
-blue_mat = gr.material({0.0, 1.0, 0.0}, {0.5, 0.5, 0.5}, 25);
-green_mat = gr.material({0.0, 0.0, 1.0}, {0.5, 0.5, 0.5}, 25);
+green_mat = gr.material({0.0, 1.0, 0.0}, {0.5, 0.5, 0.5}, 25);
+blue_mat = gr.material({0.0, 0.0, 1.0}, {0.5, 0.5, 0.5}, 25);
 grey_mat = gr.material({0.9, 0.9, 0.9}, {0.5, 0.5, 0.5}, 25);
 
 trans_mat = gr.transparent_material(0.9, 0.1, 1.2);
@@ -14,13 +14,13 @@ left_wall = gr.cube('left_wall')
 scene:add_child(left_wall)
 left_wall:set_material(red_mat)
 left_wall:scale(0.1, 10, 20)
-left_wall:translate(-5, 0, 0)
+left_wall:translate(-6.5, 0, 0)
 
 right_wall = gr.cube('right_wall')
 scene:add_child(right_wall)
 right_wall:set_material(blue_mat)
 right_wall:scale(0.1, 10, 20)
-right_wall:translate(5, 0, 0)
+right_wall:translate(6.5, 0, 0)
 
 top_wall = gr.cube('top_wall')
 scene:add_child(top_wall)
@@ -62,9 +62,9 @@ sphere4:set_material(red_mat)
 sphere4:translate(4, -3, -7)
 
 
-white_light_1 = gr.light({0, 4, -15}, {0.5, 0.5, 0.5}, {1, 0, 0})
+white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
-gr.render(scene, 'nonhier.png', 500, 500,
+gr.render(scene, 'refraction.png', 500, 500,
     {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
-    {0.3, 0.3, 0.3}, {white_light_1, white_light_2})
+    {0.1, 0.1, 0.1}, {white_light_1})

@@ -17,3 +17,19 @@ bool isZero(glm::vec3 &v) {
 void printVec3(vec3 v) {
   cout << v.x << ", " << v.y << ", " << v.z << endl;
 }
+
+float min4(float a, float b, float c, float d) {
+  return glm::min(glm::min(glm::min(a, b), c), d);
+}
+
+float max4(float a, float b, float c, float d) {
+  return glm::max(glm::max(glm::max(a, b), c), d);
+}
+
+float min3(float a, float b, float c) {
+  return glm::min(glm::min(a, b), c);
+}
+
+float max3(float a, float b, float c) {
+  return glm::max(glm::max(a, b), c);
+}

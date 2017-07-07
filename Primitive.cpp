@@ -33,6 +33,24 @@ Intersection::Range* Cube::intersect(Ray &ray, bool checkBound) {
   return b.intersect(ray, checkBound);
 }
 
+Cone::~Cone()
+{
+}
+
+Intersection::Range* Cone::intersect(Ray &ray, bool checkBound) {
+  NonhierCone c(vec3(0,0,0), 1, 1);
+  return c.intersect(ray, checkBound);
+}
+
+Cylinder::~Cylinder()
+{
+}
+
+Intersection::Range* Cylinder::intersect(Ray &ray, bool checkBound) {
+  NonhierCylinder c(vec3(0,0,0), 1, 1);
+  return c.intersect(ray, checkBound);
+}
+
 NonhierSphere::~NonhierSphere()
 {
 }
@@ -204,94 +222,123 @@ NonhierCylinder::~NonhierCylinder() {
 }
 
 Intersection::Range* NonhierCylinder::intersect(Ray &ray, bool checkBound) {
-  return new Intersection::Range();
-  // vec3 v = ray.direction;
-  // vec3 c_dir = vec3(0, 1, 0);
-  // vec3 delta_p = ray.origin - m_pos;
-  // vec3 d1 = v - glm::dot(v, c_dir) * c_dir;
-  // vec3 d2 = delta_p - glm::dot(delta_p, c_dir) * c_dir;
+  vec3 v = glm::normalize(ray.direction);
+  vec3 c_dir = vec3(0, 1, 0);
+  vec3 delta_p = ray.origin - vec3(m_pos.x, m_pos.y-m_height, m_pos.z);
+  vec3 d1 = v - glm::dot(v, c_dir) * c_dir;
+  vec3 d2 = delta_p - glm::dot(delta_p, c_dir) * c_dir;
 
-  // float a = glm::dot(d1, d1);
-  // float b = 2 * glm::dot(d1, d2);
-  // float c = glm::dot(d2, d2) - m_radius * m_radius;
+  float a = glm::dot(d1, d1);
+  float b = 2 * glm::dot(d1, d2);
+  float c = glm::dot(d2, d2) - m_radius * m_radius;
 
-  // float deter = b * b - 4 * a * c;
-  // float t1 = 0;
-  // float t2 = 0;
-  // if (deter >= 0) {
-  //   float t1 = (-b + sqrt(deter)) / (2.0f * a);
-  //   float t2 = (-b - sqrt(deter)) / (2.0f * a);    
-  // }
+  float deter = b * b - 4 * a * c;
+  bool hasTMin = true;
+  bool hasTMax = true;
+  float t1 = 0;
+  float t2 = 0;
+  if (deter < 0) {
+    hasTMin = false;
+    hasTMax = false;
+  } else {
+    t1 = (-b + sqrt(deter)) / (2.0f * a);
+    t2 = (-b - sqrt(deter)) / (2.0f * a);
+  }
 
-  // if (t1 < 0) t1 = 0;
-  // if (t2 < 0) t2 = 0;
-  // if (t1 == 0 && t2 == 0) return nullptr;
+  float tmin = glm::min(t1, t2);
+  float tmax = glm::max(t1, t2);
 
+  vec3 pHitMin = ray.origin + tmin * v;
+  vec3 pHitMax = ray.origin + tmax * v;
 
-  // float t;
-  // if (t1 < 0 && t2 < 0) {
-  //   return Intersection();
-  // } else if (t1 < 0) {
-  //   t = t2;
-  // } else if (t2 < 0) {
-  //   t = t1;
-  // } else {
-  //   t = glm::min(t1, t2);
-  // }
+  vec3 pNormalMin = glm::normalize(pHitMin - m_pos);
+  pNormalMin.y = 0;
+  vec3 pNormalMax = glm::normalize(pHitMax - m_pos);
+  pNormalMax.y = 0;
 
-  // vec3 pHit = ray.origin + t * v;
-  // if (pHit.y >= m_pos.y && pHit.y <= m_pos.y + m_height) {
-  //   vec3 pNormal = pHit - m_pos;
-  //   pNormal.y = 0;
-  //   pNormal = glm::normalize(pNormal);
+  if (!(pHitMin.y >= m_pos.y-m_height && pHitMin.y <= m_pos.y + m_height)) {
+    hasTMin = false;
+  }
 
-  //   return Intersection(nullptr, pHit, pNormal, glm::distance(ray.origin, pHit), true);
-  // } else {
-  //   vec3 p1 = m_pos;
-  //   vec3 n1 = vec3(0, -1, 0);
-  //   float denom1 = glm::dot(v, n1);
-  //   if (isZero(denom1)) {
-  //     return Intersection();
-  //   }
-  //   float pt1 = glm::dot(p1 - ray.origin, n1) / denom1;
-  //   if (glm::distance(p1, ray.origin + pt1 * v) > m_radius) {
-  //     pt1 = -1;
-  //   }
+  if (!(pHitMax.y >= m_pos.y-m_height && pHitMax.y <= m_pos.y + m_height)) {
+    hasTMax = false;
+  }
 
-  //   vec3 p2 = vec3(m_pos.x, m_pos.y + m_height, m_pos.z);
-  //   vec3 n2 = vec3(0, 1, 0);
-  //   float denom2 = glm::dot(v, n2);
-  //   if (isZero(denom2)) {
-  //     return Intersection();
-  //   }
-  //   float pt2 = glm::dot(p2 - ray.origin, n2) / denom2;
-  //   if (glm::distance(p2, ray.origin + pt2 * v) > m_radius) {
-  //     pt2 = -1;
-  //   }
+  bool hasPt1 = true;
+  bool hasPt2 = true;
+  float pt1;
+  float pt2;
+  vec3 p1 = vec3(m_pos.x, m_pos.y - m_height, m_pos.z);;
+  vec3 n1 = vec3(0, -1, 0);
+  float denom1 = glm::dot(v, n1);
+  if (isZero(denom1)) {
+    hasPt1 = false;
+  } else {
+    pt1 = glm::dot(p1 - ray.origin, n1) / denom1;
+    float dist1 = glm::distance(p1, ray.origin + pt1 * v);
+    if (dist1 > m_radius) {
+      hasPt1 = false;
+    }
+  }
 
-  //   vec3 pNormal;
-  //   if (pt1 < 0 && pt2 < 0) {
-  //     return Intersection();
-  //   } else if (pt1 < 0) {
-  //     t = pt2;
-  //     pNormal = n2;
-  //   } else if (pt2 < 0) {
-  //     t = pt1;
-  //     pNormal = n1;
-  //   } else {
-  //     if (pt1 < pt2) {
-  //       t = pt1;
-  //       pNormal = n1;
-  //     } else {
-  //       t = pt2;
-  //       pNormal = n2;
-  //     }
-  //   }
+  vec3 p2 = vec3(m_pos.x, m_pos.y + m_height, m_pos.z);
+  vec3 n2 = vec3(0, 1, 0);
+  float denom2 = glm::dot(v, n2);
+  if (isZero(denom2)) {
+    hasPt2 = false;
+  } else {
+    pt2 = glm::dot(p2 - ray.origin, n2) / denom2;
+    if (glm::distance(p2, ray.origin + pt2 * v) > m_radius) {
+      hasPt2 = false;
+    }
+  }
 
-  //   pHit = ray.origin + t * v;
-  //   return Intersection(nullptr, pHit, pNormal, glm::distance(ray.origin, pHit), true);
-  // }
-  // return Intersection();
+  float tMinTotal = min4(
+    hasTMin ? tmin : INFINITY,
+    hasTMax ? tmax : INFINITY,
+    hasPt1 ? pt1 : INFINITY,
+    hasPt2 ? pt2 : INFINITY);
+
+  float tMaxTotal = max4(
+    hasTMin ? tmin : -INFINITY,
+    hasTMax ? tmax : -INFINITY,
+    hasPt1 ? pt1 : -INFINITY,
+    hasPt2 ? pt2 : -INFINITY);
+
+  if (tMinTotal == INFINITY && tMaxTotal == -INFINITY) {
+    return new Intersection::Range();
+  }
+
+  vec3 pNormalMinTotal;
+  vec3 pNormalMaxTotal;
+
+  if (tMinTotal == tmin) {
+    pNormalMinTotal = pNormalMin;
+  } else if (tMinTotal == tmax) {
+    pNormalMinTotal = pNormalMax;
+  } else if (tMinTotal == pt1) {
+    pNormalMinTotal = n1;
+  } else {
+    pNormalMinTotal = n2;
+  }
+
+  if (tMaxTotal == tmin) {
+    pNormalMaxTotal = pNormalMin;
+  } else if (tMaxTotal == tmax) {
+    pNormalMaxTotal = pNormalMax;
+  } else if (tMaxTotal == pt1) {
+    pNormalMaxTotal = n1;
+  } else {
+    pNormalMaxTotal = n2;
+  }
+
+  Intersection::Range *range = new Intersection::Range();
+  range->start = tMinTotal;
+  range->end = tMaxTotal;
+  range->s_normal = pNormalMinTotal;
+  range->e_normal = -pNormalMaxTotal;
+  range->hit = true;
+  return range;
 }
 
 NonhierCone::~NonhierCone() {
@@ -299,74 +346,108 @@ NonhierCone::~NonhierCone() {
 }
 
 Intersection::Range* NonhierCone::intersect(Ray &ray, bool checkBound) {
-  return new Intersection::Range();
-  // vec3 center = vec3(m_pos.x, m_pos.y+m_height, m_pos.z);
-  // float angle = atan(m_radius / m_height);
+  vec3 center = vec3(m_pos.x, m_pos.y+(m_height), m_pos.z);
+  float angle = atan(m_radius / (m_height * 2.0f));
 
-  // if (angle <= 0) {
-  //   return Intersection();
-  // }
+  if (angle <= 0) {
+    return new Intersection::Range();
+  }
 
-  // vec3 v = glm::normalize(ray.direction);
-  // vec3 c_dir = vec3(0, 1, 0);
-  // vec3 delta_p = ray.origin - center;
+  vec3 v = glm::normalize(ray.direction);
+  vec3 c_dir = vec3(0, 1, 0);
+  vec3 delta_p = ray.origin - center;
   
-  // float cosA2 = cos(angle) * cos(angle);
+  float cosA2 = cos(angle) * cos(angle);
 
-  // float dv = glm::dot(v, c_dir);
-  // float cov = glm::dot(delta_p, c_dir);
-  // float a = dv * dv - cosA2;
-  // float b = 2 * (dv * cov - glm::dot(v, delta_p) * cosA2);
-  // float c = cov * cov - glm::dot(delta_p, delta_p) * cosA2;
+  float dv = glm::dot(v, c_dir);
+  float cov = glm::dot(delta_p, c_dir);
+  float a = dv * dv - cosA2;
+  float b = 2 * (dv * cov - glm::dot(v, delta_p) * cosA2);
+  float c = cov * cov - glm::dot(delta_p, delta_p) * cosA2;
 
-  // // float q = d2;
-  // // float w = pva;
-  // // cout << ray.origin.y << endl;
+  float deter = b * b - 4 * a * c;
+  bool hasTMax = true;
+  bool hasTMin = true;
+  float t1 = 0;
+  float t2 = 0;
+  if (deter < 0) {
+    hasTMax = false;
+    hasTMin = false;
+  } else {
+    t1 = (-b + sqrt(deter)) / (2.0f * a);
+    t2 = (-b - sqrt(deter)) / (2.0f * a);
+  }
 
-  // float deter = b * b - 4 * a * c;
-  // if (deter < 0) {
-  //   return Intersection();
-  // }
+  float tmin = glm::min(t1, t2);
+  float tmax = glm::max(t1, t2);
 
-  // float t1 = (-b + sqrt(deter)) / (2.0f * a);
-  // float t2 = (-b - sqrt(deter)) / (2.0f * a);
+  vec3 pHitMin = ray.origin + tmin * v;
+  vec3 pHitMax = ray.origin + tmax * v;
 
-  // float t;
-  // if (t1 < 0 && t2 < 0) {
-  //   return Intersection();
-  // } else if (t1 < 0) {
-  //   t = t2;
-  // } else if (t2 < 0) {
-  //   t = t1;
-  // } else {
-  //   t = glm::min(t1, t2);
-  // }
+  vec3 pNormalMin = glm::normalize(pHitMin - m_pos);
+  pNormalMin.y = cos(angle);
+  vec3 pNormalMax = glm::normalize(pHitMax - m_pos);
+  pNormalMax.y = cos(angle);
 
-  // vec3 pHit = ray.origin + t * v;
-  // if (pHit.y > m_pos.y && pHit.y < m_pos.y + m_height) {
-  //   vec3 pNormal = pHit - m_pos;
-  //   pNormal.y = cos(angle);
-  //   pNormal = glm::normalize(pNormal);
+  if (!(pHitMin.y > m_pos.y - m_height && pHitMin.y < m_pos.y + m_height)) {
+    hasTMin = false;
+  }
+  if (!(pHitMax.y > m_pos.y - m_height && pHitMax.y < m_pos.y + m_height)) {
+    hasTMax = false;
+  }
 
-  //   return Intersection(nullptr, pHit, pNormal, glm::distance(ray.origin, pHit), true);
-  // } else {
-  //   vec3 p1 = m_pos;
-  //   vec3 n1 = vec3(0, -1, 0);
-  //   float denom1 = glm::dot(v, n1);
-  //   if (isZero(denom1)) {
-  //     return Intersection();
-  //   }
-  //   float pt1 = glm::dot(p1 - ray.origin, n1) / denom1;
-  //   if (glm::distance(p1, ray.origin + pt1 * v) <= m_radius) {
-  //     t = pt1;
-  //   } else {
-  //     return Intersection();
-  //   }
+  bool hasPt = true;
+  float pt = 0;
+  vec3 p1 = vec3(m_pos.x, m_pos.y-(m_height), m_pos.z);;
+  vec3 n1 = vec3(0, -1, 0);
+  float denom1 = glm::dot(v, n1);
+  if (isZero(denom1)) {
+    hasPt = false;
+  } else {
+    pt = glm::dot(p1 - ray.origin, n1) / denom1;
+    if (glm::distance(p1, ray.origin + pt * v) > m_radius) {
+      hasPt = false;
+    }
+  }
 
-  //   pHit = ray.origin + t * v;
-  //   vec3 pNormal = n1;
+  float tMinTotal = min3(
+    hasTMin ? tmin : INFINITY,
+    hasTMax ? tmax : INFINITY,
+    hasPt ? pt : INFINITY);
 
-  //   return Intersection(nullptr, pHit, pNormal, glm::distance(ray.origin, pHit), true);
-  // }
-  // return Intersection();
+  float tMaxTotal = max3(
+    hasTMin ? tmin : -INFINITY,
+    hasTMax ? tmax : -INFINITY,
+    hasPt ? pt : -INFINITY);
+
+  if (tMinTotal == INFINITY && tMaxTotal == -INFINITY) {
+    return new Intersection::Range();
+  }
+
+  vec3 pNormalMinTotal;
+  vec3 pNormalMaxTotal;
+
+  if (tMinTotal == tmin) {
+    pNormalMinTotal = pNormalMin;
+  } else if (tMinTotal == tmax) {
+    pNormalMinTotal = pNormalMax;
+  } else {
+    pNormalMinTotal = n1;
+  }
+
+  if (tMaxTotal == tmin) {
+    pNormalMaxTotal = pNormalMin;
+  } else if (tMaxTotal == tmax) {
+    pNormalMaxTotal = pNormalMax;
+  } else {
+    pNormalMaxTotal = n1;
+  }
+
+  Intersection::Range *range = new Intersection::Range();
+  range->start = tMinTotal;
+  range->end = tMaxTotal;
+  range->s_normal = pNormalMinTotal;
+  range->e_normal = -pNormalMaxTotal;
+  range->hit = true;
+  return range;
 }

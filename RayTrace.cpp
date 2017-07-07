@@ -15,7 +15,7 @@ using namespace std;
 
 static bool print = false;
 
-#define NUM_THREAD_ROOT_2 1
+#define NUM_THREAD_ROOT_2 3
 
 // #define REFLECTION
 // #define REFRACTION

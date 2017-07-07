@@ -1,8 +1,4 @@
--- A simple scene with some miscellaneous geometry.
--- This file is very similar to nonhier.lua, but interposes
--- an additional transformation on the root node.  
--- The translation moves the scene, and the position of the camera
--- and lights have been modified accordingly.
+-- Primitive testing script
 
 mat1 = gr.material({0.7, 1.0, 0.7}, {0.5, 0.7, 0.5}, 25)
 mat2 = gr.material({0.1, 0.5, 0.5}, {0.5, 0.7, 0.5}, 25)
@@ -80,6 +76,6 @@ co2:translate(2, -4, -2)
 white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
-gr.render(scene, 'nonhier.png', 500, 500,
-	  {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
-	  {0.1, 0.1, 0.1}, {white_light_1})
+gr.render(scene, 'primitive.png', 1000, 1000,
+    {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
+    {0.1, 0.1, 0.1}, {white_light_1})

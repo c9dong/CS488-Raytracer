@@ -25,6 +25,20 @@ public:
   Intersection::Range* intersect(Ray &ray, bool checkBound);
 };
 
+class Cone : public Primitive {
+public:
+  virtual ~Cone();
+
+  Intersection::Range* intersect(Ray &ray, bool checkBound);
+};
+
+class Cylinder : public Primitive {
+public:
+  virtual ~Cylinder();
+
+  Intersection::Range* intersect(Ray &ray, bool checkBound);
+};
+
 class NonhierSphere : public Primitive {
 public:
   NonhierSphere(const glm::vec3& pos, double radius)
