@@ -10,7 +10,7 @@ glm::vec3 Shadow::getColor(Intersection::Hit hit, Light *light, SceneNode *root)
   vec3 shadow_origin = hit.pHit + hit.pNormal * 0.1f;
   vec3 shadow_direction = glm::normalize(light->position - shadow_origin);
   Ray shadowRay(shadow_origin, shadow_direction);
-  vec3 color = ambient;
+  vec3 color = vec3(0);
   Intersection intersect = root->intersect(shadowRay, true);
   Intersection::Hit shadow_hit = intersect.getFirstHit(shadowRay);
   if (shadow_hit.hit) {
@@ -39,7 +39,7 @@ glm::vec3 SoftShadow::getColor(Intersection::Hit hit, Light *light, SceneNode *r
 
   float start_x = light->position.x - m_radius;
   float start_y = light->position.y - m_radius;
-  float delta = 0.4f;
+  float delta = 0.5f;
 
   float sample = (2 * m_radius / delta) * (2 * m_radius / delta);
   for (float i = start_x; i < light->position.x + m_radius; i+=delta) {
@@ -50,19 +50,8 @@ glm::vec3 SoftShadow::getColor(Intersection::Hit hit, Light *light, SceneNode *r
       Light *new_light = new Light(*light);
       new_light->position = light_pos;
 
-      Intersection intersect = root->intersect(shadowRay, true);
-      Intersection::Hit shadow_hit = intersect.getFirstHit(shadowRay);
-      if (shadow_hit.hit) {
-        float light_dist = glm::distance(light->position, shadowRay.origin);
-        float hit_dist = glm::distance(shadow_hit.pHit, shadowRay.origin);
-        if (light_dist > hit_dist) {
-          continue;
-        }
-      }
-      color += hit.mat->getColor(hit.pHit, hit.pNormal, new_light, hit.inv, nullptr);
-      // if (!intersect.getFirstHit(shadowRay).hit) {
-      //   color += hit.mat->getColor(hit.pHit, hit.pNormal, new_light, hit.inv);
-      // }
+      vec3 shadow_color = Shadow::getColor(hit, new_light, root);
+      color += shadow_color;
     }
   }
   color = color / sample;

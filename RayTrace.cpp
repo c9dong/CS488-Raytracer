@@ -13,8 +13,6 @@
 using namespace glm;
 using namespace std;
 
-static bool print = false;
-
 #define NUM_THREAD_ROOT_2 3
 
 // #define REFLECTION
@@ -58,7 +56,6 @@ void *createImagePart(void *arguments) {
 
   for (int x=x_start; x<std::min(x_start+x_size, x_max); x++) {
     for (int y=y_start; y<std::min(y_start+y_size, y_max); y++) {
-      if (x == 80 && y == 170) print = true;
       vec4 p_world = world_mat * vec4(float(x), float(y), 0.0f, 1.0f);
 
       vec3 r_origin = vec3(raytrace->getEye());
@@ -72,12 +69,6 @@ void *createImagePart(void *arguments) {
       raytrace->getImage()(x, y, 0) = col.r;
       raytrace->getImage()(x, y, 1) = col.g;
       raytrace->getImage()(x, y, 2) = col.b;
-      if (x == 80 && y == 170) {
-        raytrace->getImage()(x, y, 0) = 0;
-        raytrace->getImage()(x, y, 1) = 0;
-        raytrace->getImage()(x, y, 2) = 0;
-      }
-      print = false;
     }
   }
   pthread_exit(NULL);
