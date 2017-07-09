@@ -1,12 +1,4 @@
--- Primitive testing script
-
-mat1 = gr.material({0.7, 1.0, 0.7}, {0.5, 0.7, 0.5}, 25)
-mat2 = gr.material({0.1, 0.5, 0.5}, {0.5, 0.7, 0.5}, 25)
-mat3 = gr.material({1.0, 0.6, 0.1}, {0.5, 0.7, 0.5}, 25)
-mat4 = gr.material({0.7, 0.6, 1.0}, {0.5, 0.4, 0.8}, 25)
-mat5 = gr.cube_texture('Assets/basketball.png')
-mat6 = gr.sphere_texture('Assets/world.png')
-
+-- Depth of field testing script
 red_mat = gr.material({1.0, 0.0, 0.0}, {0.5, 0.5, 0.5}, 25);
 green_mat = gr.material({0.0, 1.0, 0.0}, {0.5, 0.5, 0.5}, 25);
 blue_mat = gr.material({0.0, 0.0, 1.0}, {0.5, 0.5, 0.5}, 25);
@@ -75,7 +67,7 @@ sphere4:translate(2, -2.5, -2)
 white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
-gr.render(scene, 'nonhier.png', 256, 256,
+gr.render(scene, 'results/depth.png', 256, 256,
     {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
     {0.1, 0.1, 0.1}, {white_light_1}, 
     -- focal dist

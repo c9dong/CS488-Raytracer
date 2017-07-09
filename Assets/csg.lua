@@ -262,6 +262,16 @@ union2:add_child(sphere4)
 white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
-gr.render(scene, 'csg.png', 1000, 1000,
+gr.render(scene, 'results/csg.png', 1000, 1000,
     {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
-    {0.1, 0.1, 0.1}, {white_light_1})
+    {0.1, 0.1, 0.1}, {white_light_1}, 
+    -- focal dist
+    -15, 
+    -- camera radius (0 for point)
+    0, 
+    -- camera sample rate (0 for infinite loop)
+    0.2,
+    -- anti aliasing sample radius (0 for no sample)
+    0,
+    -- anti aliasing sample rate (0 for infinite loop)
+    0.5)

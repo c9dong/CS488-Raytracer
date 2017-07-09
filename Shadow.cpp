@@ -27,7 +27,7 @@ glm::vec3 Shadow::getColor(Intersection::Hit hit, Light *light, SceneNode *root)
 Shadow::~Shadow() {}
 
 SoftShadow::SoftShadow(glm::vec3 ambient) 
-  : Shadow(ambient), m_radius(2.0f) {}
+  : Shadow(ambient), m_radius(1.0f) {}
 
 SoftShadow::SoftShadow(glm::vec3 ambient, float radius) 
   : Shadow(ambient), m_radius(radius) {}
@@ -40,7 +40,7 @@ glm::vec3 SoftShadow::getColor(Intersection::Hit hit, Light *light, SceneNode *r
 
   float start_x = light->position.x - m_radius;
   float start_y = light->position.y - m_radius;
-  float delta = 0.25f;
+  float delta = 0.5f;
 
   float sample = (2 * m_radius / delta) * (2 * m_radius / delta);
   for (float i = start_x; i < light->position.x + m_radius; i+=delta) {

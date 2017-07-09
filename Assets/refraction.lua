@@ -65,6 +65,17 @@ sphere4:translate(4, -3, -7)
 white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
-gr.render(scene, 'refraction.png', 500, 500,
+gr.render(scene, 'results/refraction.png', 500, 500,
     {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
-    {0.1, 0.1, 0.1}, {white_light_1})
+    {0.1, 0.1, 0.1}, {white_light_1}, 
+    -- focal dist
+    -15, 
+    -- camera radius (0 for point)
+    0, 
+    -- camera sample rate (0 for infinite loop)
+    0.2,
+    -- anti aliasing sample radius (0 for no sample)
+    0,
+    -- anti aliasing sample rate (0 for infinite loop)
+    0.5)
+

@@ -456,8 +456,15 @@ int gr_render_cmd(lua_State* L)
     lua_pop(L, 1);
   }
 
+  double focal_dist = luaL_checknumber(L, 11);
+  double camera_rad = luaL_checknumber(L, 12);
+  double camera_sample_rate = luaL_checknumber(L, 13);
+
+  double anti_sample_rad = luaL_checknumber(L, 14);
+  double anti_sample_rate = luaL_checknumber(L, 15);
+
 	Image im( width, height);
-	A4_Render(root->node, im, eye, view, up, fov, ambient, lights);
+	A4_Render(root->node, im, eye, view, up, fov, ambient, lights, focal_dist, camera_rad, camera_sample_rate, anti_sample_rad, anti_sample_rate);
     im.savePng( filename );
 
 	return 0;

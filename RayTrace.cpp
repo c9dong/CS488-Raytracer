@@ -13,9 +13,7 @@
 using namespace glm;
 using namespace std;
 
-#define NUM_THREAD_ROOT_2 3
-
-#define ANTIALISING
+#define NUM_THREAD_ROOT_2 4
 
 // #define REFLECTION
 // #define REFRACTION
@@ -29,7 +27,12 @@ RayTrace::RayTrace(
     double fovy,
     const glm::vec3 & ambient,
     const std::list<Light *> & lights,
-    Shadow &shadow)
+    Shadow &shadow,
+    double focal_dist,
+    double camera_radius,
+    double camera_sample_rate,
+    double anti_sample_radius,
+    double anti_sample_rate)
     : root(root), 
       image(image), 
       eye(eye),
@@ -38,7 +41,12 @@ RayTrace::RayTrace(
       fovy(fovy),
       ambient(ambient),
       lights(lights),
-      shadow(shadow)
+      shadow(shadow),
+      focal_dist(focal_dist),
+      camera_radius(camera_radius),
+      camera_sample_rate(camera_sample_rate),
+      anti_sample_radius(anti_sample_radius),
+      anti_sample_rate(anti_sample_rate)
 {
 
 }
@@ -56,12 +64,14 @@ void *createImagePart(void *arguments) {
   mat4 world_mat = arg->world_mat;
   RayTrace *raytrace = arg->raytrace;
 
+  float anti_sample_rate = float(raytrace->getAntiSampleRate());
+  float anti_sample_radius = float(raytrace->getAntiSampleRadius());
+
   for (int x=x_start; x<std::min(x_start+x_size, x_max); x++) {
     for (int y=y_start; y<std::min(y_start+y_size, y_max); y++) {
       vec3 col = vec3(0);
-      #ifdef ANTIALISING
-      for (float x_delta=-0.5; x_delta<=0.5; x_delta+=0.5) {
-        for (float y_delta=-0.5; y_delta<=0.5; y_delta+=0.5) {
+      for (float x_delta=-anti_sample_radius; x_delta<=anti_sample_radius; x_delta+=anti_sample_rate) {
+        for (float y_delta=-anti_sample_radius; y_delta<=anti_sample_radius; y_delta+=anti_sample_rate) {
           float new_x = float(x)+x_delta;
           float new_y = float(y)+y_delta;
 
@@ -69,26 +79,37 @@ void *createImagePart(void *arguments) {
 
           vec3 r_origin = vec3(raytrace->getEye());
           vec3 r_direction = vec3(p_world) - r_origin;
-          Ray ray(r_origin, r_direction);
+          float focalPlane = float(raytrace->getFocalDist());
+          float camera_rad = float(raytrace->getCameraRadius());
+          float camera_sample = float(raytrace->getCameraSampleRate());
 
-          vec3 background = raytrace->getBackgroundColor(ray);
+          float t = (focalPlane - p_world.z) / r_direction.z;
+          vec3 focalPoint = vec3(p_world.x*t, p_world.y*t, p_world.z*t);
 
-          col += raytrace->getRayColor(ray, background, 0, nullptr);
+          int random_sample_size = 16;
+          vec3 final_col = vec3(0);
+          for (float x_eye_delta=-camera_rad; x_eye_delta<=camera_rad; x_eye_delta+=camera_sample) {
+            for (float y_eye_delta=-camera_rad; y_eye_delta<=camera_rad; y_eye_delta+=camera_sample) {
+              vec3 new_p = vec3(p_world.x + x_eye_delta, p_world.y + y_eye_delta, p_world.z);
+              vec3 r_f_origin = new_p;
+              vec3 r_f_direction = focalPoint - r_f_origin;
+              Ray ray(r_f_origin, r_f_direction);
+              vec3 background = raytrace->getBackgroundColor(ray);
+              final_col += raytrace->getRayColor(ray, background, 0, nullptr);
+            }
+          }
+
+          float camera_sample_size = (((2 * camera_rad / camera_sample) + 1) * ((2 * camera_rad / camera_sample) + 1));
+          if (camera_sample_size != 0) {
+            final_col = final_col / camera_sample_size;
+          }
+          col += final_col;
         }  
       }
-      col = col / 9.0f;
-      #endif
-      #ifndef ANTIALISING
-      vec4 p_world = world_mat * vec4(x, y, 0.0f, 1.0f);
-
-      vec3 r_origin = vec3(raytrace->getEye());
-      vec3 r_direction = vec3(p_world) - r_origin;
-      Ray ray(r_origin, r_direction);
-
-      vec3 background = raytrace->getBackgroundColor(ray);
-
-      col += raytrace->getRayColor(ray, background, 0, nullptr);
-      #endif
+      float anti_sample_size = (((2 * anti_sample_radius / anti_sample_rate) + 1) * ((2 * anti_sample_radius / anti_sample_rate) + 1));
+      if (anti_sample_size != 0) {
+        col = col / anti_sample_size;
+      }
 
       raytrace->getImage()(x, y, 0) = col.r;
       raytrace->getImage()(x, y, 1) = col.g;
@@ -289,6 +310,26 @@ glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit, M
     col = getBackgroundColor(ray);
   }
   return col;
+}
+
+double RayTrace::getCameraRadius() {
+  return camera_radius;
+}
+
+double RayTrace::getCameraSampleRate() {
+  return camera_sample_rate;
+}
+
+double RayTrace::getFocalDist() {
+  return focal_dist;
+}
+
+double RayTrace::getAntiSampleRadius() {
+  return anti_sample_radius;
+}
+
+double RayTrace::getAntiSampleRate() {
+  return anti_sample_rate;
 }
 
 glm::vec3 RayTrace::getRefractAngle(glm::vec3 direction, glm::vec3 normal, float kr) {

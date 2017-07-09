@@ -1,11 +1,4 @@
--- Primitive testing script
-
-mat1 = gr.material({0.7, 1.0, 0.7}, {0.5, 0.7, 0.5}, 25)
-mat2 = gr.material({0.1, 0.5, 0.5}, {0.5, 0.7, 0.5}, 25)
-mat3 = gr.material({1.0, 0.6, 0.1}, {0.5, 0.7, 0.5}, 25)
-mat4 = gr.material({0.7, 0.6, 1.0}, {0.5, 0.4, 0.8}, 25)
-mat5 = gr.cube_texture('Assets/basketball.png')
-mat6 = gr.sphere_texture('Assets/world.png')
+-- Same antialiasing testing script without antialiasing
 
 red_mat = gr.material({1.0, 0.0, 0.0}, {0.5, 0.5, 0.5}, 25);
 green_mat = gr.material({0.0, 1.0, 0.0}, {0.5, 0.5, 0.5}, 25);
@@ -47,41 +40,29 @@ back_wall:set_material(grey_mat)
 back_wall:scale(20, 20, 0.1)
 back_wall:translate(0, 0, -10)
 
+cy1 = gr.cylinder('cy1')
+scene:add_child(cy1)
+cy1:set_material(green_mat)
+cy1:scale(1, 1.5, 1)
+cy1:translate(-2, -3.5, 0)
+
 sphere1 = gr.sphere('sphere1')
 scene:add_child(sphere1)
 sphere1:set_material(blue_mat)
 sphere1:scale(1.5, 1.5, 1.5)
-sphere1:translate(-4, -2.5, 4)
-
-sphere2 = gr.sphere('sphere2')
-scene:add_child(sphere2)
-sphere2:set_material(blue_mat)
-sphere2:scale(1.5, 1.5, 1.5)
-sphere2:translate(-2, -2.5, 2)
-
-sphere3 = gr.sphere('sphere3')
-scene:add_child(sphere3)
-sphere3:set_material(blue_mat)
-sphere3:scale(1.5, 1.5, 1.5)
-sphere3:translate(0, -2.5, 0)
-
-sphere4 = gr.sphere('sphere4')
-scene:add_child(sphere4)
-sphere4:set_material(blue_mat)
-sphere4:scale(1.5, 1.5, 1.5)
-sphere4:translate(2, -2.5, -2)
+sphere1:translate(1, -2.5, -2)
 
 
 white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
-gr.render(scene, 'nonhier.png', 256, 256,
+gr.render(scene, 'results/noantialiasing.png', 256, 256,
     {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
     {0.1, 0.1, 0.1}, {white_light_1}, 
     -- focal dist
     -15, 
     -- camera radius (0 for point)
-    1.0, 
+    0, 
     -- camera sample rate (0 for infinite loop)
     0.2,
     -- anti aliasing sample radius (0 for no sample)

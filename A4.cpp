@@ -7,7 +7,7 @@
 using namespace std;
 using namespace glm;
 
-#define TEST
+// #define TEST
 
 #ifdef TEST
 #include "Intersection.hpp"
@@ -144,7 +144,16 @@ void A4_Render(
 
 		// Lighting parameters
 		const glm::vec3 & ambient,
-		const std::list<Light *> & lights
+		const std::list<Light *> & lights,
+
+		// Camera parameters
+		double focal_dist,
+		double camera_radius,
+		double camera_sample_rate,
+
+		// Antialiasing
+    double anti_sample_radius,
+    double anti_sample_rate
 ) {
 
 	#ifdef TEST
@@ -173,6 +182,6 @@ void A4_Render(
 	
 	vec3 shadow_color = vec3(0.0f);
 	Shadow shadow(shadow_color);
-	RayTrace raytrace(root, image, eye, view, up, fovy, ambient, lights, shadow);
+	RayTrace raytrace(root, image, eye, view, up, fovy, ambient, lights, shadow, focal_dist, camera_radius, camera_sample_rate, anti_sample_radius, anti_sample_rate);
 	raytrace.generateImage();
 }

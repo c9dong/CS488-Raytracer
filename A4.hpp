@@ -21,5 +21,10 @@ void A4_Render(
 
 		// Lighting parameters
 		const glm::vec3 & ambient,
-		const std::list<Light *> & lights
+		const std::list<Light *> & lights,
+		double focal_dist,
+		double camera_radius,
+		double camera_sample_rate,
+		double anti_sample_radius,
+    double anti_sample_rate
 );

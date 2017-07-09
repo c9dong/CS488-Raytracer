@@ -53,16 +53,26 @@ cy1:set_material(green_mat)
 cy1:scale(1, 1.5, 1)
 cy1:translate(-2, -3.5, 0)
 
--- sphere1 = gr.sphere('sphere1')
--- scene:add_child(sphere1)
--- sphere1:set_material(blue_mat)
--- sphere1:scale(1.5, 1.5, 1.5)
--- sphere1:translate(1, -2.5, -2)
+sphere1 = gr.sphere('sphere1')
+scene:add_child(sphere1)
+sphere1:set_material(blue_mat)
+sphere1:scale(1.5, 1.5, 1.5)
+sphere1:translate(1, -2.5, -2)
 
 
 white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
-gr.render(scene, 'nonhier.png', 500, 500,
+gr.render(scene, 'results/softshadow.png', 256, 256,
     {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
-    {0.1, 0.1, 0.1}, {white_light_1})
+    {0.1, 0.1, 0.1}, {white_light_1}, 
+    -- focal dist
+    -15, 
+    -- camera radius (0 for point)
+    0, 
+    -- camera sample rate (0 for infinite loop)
+    0.2,
+    -- anti aliasing sample radius (0 for no sample)
+    0,
+    -- anti aliasing sample rate (0 for infinite loop)
+    0.5)

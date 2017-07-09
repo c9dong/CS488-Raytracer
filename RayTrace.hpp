@@ -30,13 +30,24 @@ public:
     double fovy,
     const glm::vec3 & ambient,
     const std::list<Light *> & lights,
-    Shadow &shadow);
+    Shadow &shadow,
+    double focal_dist,
+    double camera_radius,
+    double camera_sample_rate,
+    double anti_sample_radius,
+    double anti_sample_rate);
 
   virtual ~RayTrace();
 
   void generateImage();
   Image& getImage();
   const glm::vec3& getEye();
+  double getFocalDist();
+  double getCameraRadius();
+  double getCameraSampleRate();
+  double getAntiSampleRadius();
+  double getAntiSampleRate();
+
   glm::vec3 getBackgroundColor(Ray &ray);
   glm::vec3 getRayColor(Ray & ray, glm::vec3 & background, int maxHit, Material *lastMat);
 private:
@@ -53,6 +64,11 @@ private:
   double fovy;
   const glm::vec3 & ambient;
   const std::list<Light *> & lights;
+  double focal_dist;
+  double camera_radius;
+  double camera_sample_rate;
+  double anti_sample_radius;
+  double anti_sample_rate;
 
   Shadow &shadow;
 };

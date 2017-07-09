@@ -33,3 +33,8 @@ float min3(float a, float b, float c) {
 float max3(float a, float b, float c) {
   return glm::max(glm::max(a, b), c);
 }
+
+float randomNum(int dist) {
+  float half = float(dist) / 2.0f;
+  return float(rand() % ((dist) * 100000+1)) / 100000.0f - half;
+}
