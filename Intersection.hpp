@@ -83,9 +83,9 @@ public:
   virtual ~Intersection();
 
   void addRange(Range *range);
-  Intersection intersect_intersection(Intersection &other);
-  Intersection union_intersection(Intersection &other);
-  Intersection difference_intersection(Intersection &other);
+  Intersection* intersect_intersection(Intersection *other);
+  Intersection* union_intersection(Intersection *other);
+  Intersection* difference_intersection(Intersection *other);
 
   Intersection::Hit getFirstHit(Ray &ray);
   void transformRanges(Ray &ray, Ray &inv_ray, glm::mat4 trans, glm::mat4 invtrans);

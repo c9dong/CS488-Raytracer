@@ -15,6 +15,8 @@ using namespace std;
 
 #define NUM_THREAD_ROOT_2 3
 
+#define ANTIALISING
+
 // #define REFLECTION
 // #define REFRACTION
 
@@ -56,7 +58,28 @@ void *createImagePart(void *arguments) {
 
   for (int x=x_start; x<std::min(x_start+x_size, x_max); x++) {
     for (int y=y_start; y<std::min(y_start+y_size, y_max); y++) {
-      vec4 p_world = world_mat * vec4(float(x), float(y), 0.0f, 1.0f);
+      vec3 col = vec3(0);
+      #ifdef ANTIALISING
+      for (float x_delta=-0.5; x_delta<=0.5; x_delta+=0.5) {
+        for (float y_delta=-0.5; y_delta<=0.5; y_delta+=0.5) {
+          float new_x = float(x)+x_delta;
+          float new_y = float(y)+y_delta;
+
+          vec4 p_world = world_mat * vec4(new_x, new_y, 0.0f, 1.0f);
+
+          vec3 r_origin = vec3(raytrace->getEye());
+          vec3 r_direction = vec3(p_world) - r_origin;
+          Ray ray(r_origin, r_direction);
+
+          vec3 background = raytrace->getBackgroundColor(ray);
+
+          col += raytrace->getRayColor(ray, background, 0, nullptr);
+        }  
+      }
+      col = col / 9.0f;
+      #endif
+      #ifndef ANTIALISING
+      vec4 p_world = world_mat * vec4(x, y, 0.0f, 1.0f);
 
       vec3 r_origin = vec3(raytrace->getEye());
       vec3 r_direction = vec3(p_world) - r_origin;
@@ -64,7 +87,8 @@ void *createImagePart(void *arguments) {
 
       vec3 background = raytrace->getBackgroundColor(ray);
 
-      vec3 col = raytrace->getRayColor(ray, background, 0, nullptr);
+      col += raytrace->getRayColor(ray, background, 0, nullptr);
+      #endif
 
       raytrace->getImage()(x, y, 0) = col.r;
       raytrace->getImage()(x, y, 1) = col.g;
@@ -180,9 +204,10 @@ mat4 RayTrace::getPointToWorldMatrix() {
 // }
 
 glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit, Material *lastMat) {
-  Intersection intersection = root->intersect(ray, false);
+  Intersection *intersection = root->intersect(ray, false);
   vec3 col;
-  Intersection::Hit hit = intersection.getFirstHit(ray);
+  Intersection::Hit hit = intersection->getFirstHit(ray);
+  delete intersection;
   if (hit.hit) {
     col = ambient;
     TransparentMaterial *tMat;
@@ -192,8 +217,9 @@ glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit, M
         vec3 origin = hit.pHit - hit.pNormal*0.1f;
         vec3 refract_direction = getRefractAngle(ray.direction, hit.pNormal, kr);
         Ray refractRay(origin, refract_direction);
-        Intersection internal_intersection = root->intersect(refractRay, false);
-        Intersection::Hit internalHit = internal_intersection.getFirstHit(refractRay);
+        Intersection *internal_intersection = root->intersect(refractRay, false);
+        Intersection::Hit internalHit = internal_intersection->getFirstHit(refractRay);
+        delete internal_intersection;
         vec3 internal_origin = internalHit.pHit - internalHit.pNormal*0.1f;
         vec3 internal_refract_direction = getRefractAngle(refractRay.direction, internalHit.pNormal, kr);
         Ray newRefractRay(internal_origin, internal_refract_direction);

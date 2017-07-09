@@ -29,22 +29,26 @@ void testUnion() {
 	Intersection::Range *r3 = new Intersection::Range(p5, p6);
 	Intersection::Range *r4 = new Intersection::Range(p7, p8);
 
-	Intersection i1;
-	Intersection i2;
-	i1.addRange(r1);
-	i1.addRange(r2);
+	Intersection *i1 = new Intersection();
+	Intersection *i2 = new Intersection();
+	i1->addRange(r1);
+	i1->addRange(r2);
 
-	i2.addRange(r3);
-	i2.addRange(r4);
+	i2->addRange(r3);
+	i2->addRange(r4);
 
-	Intersection i3 = i1.union_intersection(i2);
-	assert(i3.ranges.size() == 2);
-	assert(i3.ranges[0]->start == 1);
-	assert(i3.ranges[0]->end == 11);
-	assert(i3.ranges[1]->start == 15);
-	assert(i3.ranges[1]->end == 17);
+	Intersection *i3 = i1->union_intersection(i2);
+	assert(i3->ranges.size() == 2);
+	assert(i3->ranges[0]->start == 1);
+	assert(i3->ranges[0]->end == 11);
+	assert(i3->ranges[1]->start == 15);
+	assert(i3->ranges[1]->end == 17);
 
 	cout << "Test Union success" << endl;
+
+	delete i1;
+	delete i2;
+	delete i3;
 }
 
 void testIntersection() {
@@ -64,22 +68,25 @@ void testIntersection() {
 	Intersection::Range *r3 = new Intersection::Range(p5, p6);
 	Intersection::Range *r4 = new Intersection::Range(p7, p8);
 
-	Intersection i1;
-	Intersection i2;
-	i1.addRange(r1);
-	i1.addRange(r2);
+	Intersection *i1 = new Intersection();
+	Intersection *i2 = new Intersection();
+	i1->addRange(r1);
+	i1->addRange(r2);
 
-	i2.addRange(r3);
-	i2.addRange(r4);
+	i2->addRange(r3);
+	i2->addRange(r4);
 
-	Intersection i3 = i1.intersect_intersection(i2);
-	assert(i3.ranges.size() == 2);
-	assert(i3.ranges[0]->start == 5);
-	assert(i3.ranges[0]->end == 5);
-	assert(i3.ranges[1]->start == 7);
-	assert(i3.ranges[1]->end == 7);
+	Intersection *i3 = i1->intersect_intersection(i2);
+	assert(i3->ranges.size() == 2);
+	assert(i3->ranges[0]->start == 5);
+	assert(i3->ranges[0]->end == 5);
+	assert(i3->ranges[1]->start == 7);
+	assert(i3->ranges[1]->end == 7);
 
 	cout << "Test Intersection success" << endl;
+	delete i1;
+	delete i2;
+	delete i3;
 }
 
 void testDifference() {
@@ -99,26 +106,25 @@ void testDifference() {
 	Intersection::Range *r3 = new Intersection::Range(p5, p6);
 	Intersection::Range *r4 = new Intersection::Range(p7, p8);
 
-	Intersection i1;
-	Intersection i2;
-	i1.addRange(r1);
-	i1.addRange(r2);
+	Intersection *i1 = new Intersection();
+	Intersection *i2 = new Intersection();
+	i1->addRange(r1);
+	i1->addRange(r2);
 
-	i2.addRange(r3);
-	i2.addRange(r4);
+	i2->addRange(r3);
+	i2->addRange(r4);
 
-	Intersection i3 = i1.difference_intersection(i2);
-	cout << i3.ranges[0]->start << endl;
-	cout << i3.ranges[0]->end << endl;
-	cout << i3.ranges[1]->start << endl;
-	cout << i3.ranges[1]->end << endl;
-	assert(i3.ranges.size() == 2);
-	assert(i3.ranges[0]->start == 1);
-	assert(i3.ranges[0]->end == 3);
-	assert(i3.ranges[1]->start == 9);
-	assert(i3.ranges[1]->end == 11);
+	Intersection *i3 = i1->difference_intersection(i2);
+	assert(i3->ranges.size() == 2);
+	assert(i3->ranges[0]->start == 1);
+	assert(i3->ranges[0]->end == 3);
+	assert(i3->ranges[1]->start == 9);
+	assert(i3->ranges[1]->end == 11);
 
 	cout << "Test Difference success" << endl;
+	delete i1;
+	delete i2;
+	delete i3;
 }
 
 #endif
@@ -166,7 +172,7 @@ void A4_Render(
 	std:: cout <<")" << std::endl;
 	
 	vec3 shadow_color = vec3(0.0f);
-	SoftShadow shadow(shadow_color);
+	Shadow shadow(shadow_color);
 	RayTrace raytrace(root, image, eye, view, up, fovy, ambient, lights, shadow);
 	raytrace.generateImage();
 }

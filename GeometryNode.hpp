@@ -11,7 +11,7 @@ public:
 
 	void setMaterial( Material *material );
 
-  Intersection intersect(Ray & ray, bool checkBound);
+  Intersection* intersect(Ray & ray, bool checkBound);
 
 	Material *m_material;
 	Primitive *m_primitive;

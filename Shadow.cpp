@@ -11,8 +11,9 @@ glm::vec3 Shadow::getColor(Intersection::Hit hit, Light *light, SceneNode *root)
   vec3 shadow_direction = glm::normalize(light->position - shadow_origin);
   Ray shadowRay(shadow_origin, shadow_direction);
   vec3 color = vec3(0);
-  Intersection intersect = root->intersect(shadowRay, true);
-  Intersection::Hit shadow_hit = intersect.getFirstHit(shadowRay);
+  Intersection *intersect = root->intersect(shadowRay, true);
+  Intersection::Hit shadow_hit = intersect->getFirstHit(shadowRay);
+  delete intersect;
   if (shadow_hit.hit) {
     float light_dist = glm::distance(light->position, shadowRay.origin);
     float hit_dist = glm::distance(shadow_hit.pHit, shadowRay.origin);
@@ -39,7 +40,7 @@ glm::vec3 SoftShadow::getColor(Intersection::Hit hit, Light *light, SceneNode *r
 
   float start_x = light->position.x - m_radius;
   float start_y = light->position.y - m_radius;
-  float delta = 0.5f;
+  float delta = 0.25f;
 
   float sample = (2 * m_radius / delta) * (2 * m_radius / delta);
   for (float i = start_x; i < light->position.x + m_radius; i+=delta) {

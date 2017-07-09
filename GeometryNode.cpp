@@ -30,24 +30,24 @@ void GeometryNode::setMaterial( Material *mat )
 	m_material = mat;
 }
 
-Intersection GeometryNode::intersect(Ray &ray, bool checkBound) {
+Intersection* GeometryNode::intersect(Ray &ray, bool checkBound) {
 	vec3 inv_origin = vec3(invtrans * vec4(ray.origin, 1));
 	vec3 inv_direction = glm::normalize(vec3(invtrans * vec4(ray.direction, 0)));
 	Ray inverseRay(inv_origin, inv_direction);
 
 	Intersection::Range *range = m_primitive->intersect(inverseRay, checkBound);
 
-	Intersection i;
+	Intersection *i = new Intersection();
 	if (range->hit) {
 		range->s_mat = m_material;
 		range->e_mat = m_material;
 		range->s_inv = invtrans;
 		range->e_inv = invtrans;
 
-		i.addRange(range);
+		i->addRange(range);
 	}
 
-	i.transformRanges(ray, inverseRay, trans, invtrans);
+	i->transformRanges(ray, inverseRay, trans, invtrans);
 
 	return i;
 }

@@ -1,4 +1,4 @@
--- Soft shadow testing script
+-- Antialiasing testing script
 
 mat1 = gr.material({0.7, 1.0, 0.7}, {0.5, 0.7, 0.5}, 25)
 mat2 = gr.material({0.1, 0.5, 0.5}, {0.5, 0.7, 0.5}, 25)
@@ -53,16 +53,16 @@ cy1:set_material(green_mat)
 cy1:scale(1, 1.5, 1)
 cy1:translate(-2, -3.5, 0)
 
--- sphere1 = gr.sphere('sphere1')
--- scene:add_child(sphere1)
--- sphere1:set_material(blue_mat)
--- sphere1:scale(1.5, 1.5, 1.5)
--- sphere1:translate(1, -2.5, -2)
+sphere1 = gr.sphere('sphere1')
+scene:add_child(sphere1)
+sphere1:set_material(blue_mat)
+sphere1:scale(1.5, 1.5, 1.5)
+sphere1:translate(1, -2.5, -2)
 
 
 white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
-gr.render(scene, 'nonhier.png', 500, 500,
+gr.render(scene, 'antialiasing.png', 500, 500,
     {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
     {0.1, 0.1, 0.1}, {white_light_1})

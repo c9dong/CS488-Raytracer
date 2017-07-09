@@ -8,5 +8,5 @@ class IntersectNode : public SceneNode {
 public:
   IntersectNode( const std::string & name );
 
-  Intersection intersect(Ray & ray, bool checkBound);
+  Intersection* intersect(Ray & ray, bool checkBound);
 };

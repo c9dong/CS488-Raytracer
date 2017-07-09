@@ -12,6 +12,9 @@ Intersection::Intersection() {
 }
 
 Intersection::~Intersection() {
+  for (Range *r : ranges) {
+    delete r;
+  }
 }
 
 bool sortFunc(Intersection::Range &r1, Intersection::Range &r2) {
@@ -29,7 +32,7 @@ void Intersection::addRange(Range *range) {
   ranges.push_back(range);
 }
 
-Intersection Intersection::intersect_intersection(Intersection &other) {
+Intersection* Intersection::intersect_intersection(Intersection *other) {
   vector<Intersection::Point*> points;
   for (Range *r : ranges) {
     Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
@@ -37,7 +40,7 @@ Intersection Intersection::intersect_intersection(Intersection &other) {
     points.push_back(p1);
     points.push_back(p2);
   }
-  for (Range *r : (other.ranges)) {
+  for (Range *r : (other->ranges)) {
     Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
     Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat, r->e_inv);
     points.push_back(p1);
@@ -47,7 +50,7 @@ Intersection Intersection::intersect_intersection(Intersection &other) {
 
   int counter = 0;
   Point *startPoint;
-  Intersection newIntersection;
+  Intersection *newIntersection = new Intersection();
   for (Intersection::Point *p : points) {
     int lastCounter = counter;
     if (p->position == 0) {
@@ -57,14 +60,14 @@ Intersection Intersection::intersect_intersection(Intersection &other) {
       counter --;
     }
     if (lastCounter - counter == 1 && !(lastCounter + counter == 1)) {
-      newIntersection.addRange(new Range(*startPoint, *p));
+      newIntersection->addRange(new Range(*startPoint, *p));
     }
   }
 
   return newIntersection;
 }
 
-Intersection Intersection::union_intersection(Intersection &other) {
+Intersection* Intersection::union_intersection(Intersection *other) {
   vector<Intersection::Point*> points;
   for (Range *r : ranges) {
     Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
@@ -72,7 +75,7 @@ Intersection Intersection::union_intersection(Intersection &other) {
     points.push_back(p1);
     points.push_back(p2);
   }
-  for (Range *r : (other.ranges)) {
+  for (Range *r : (other->ranges)) {
     Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
     Intersection::Point *p2 = new Point(r->end, 1, r->e_normal, r->e_mat, r->e_inv);
     points.push_back(p1);
@@ -82,7 +85,7 @@ Intersection Intersection::union_intersection(Intersection &other) {
 
   int counter = 0;
   Point *startPoint;
-  Intersection newIntersection;
+  Intersection *newIntersection = new Intersection();
   for (Intersection::Point *p : points) {
     int lastCounter = counter;
     if (p->position == 0) {
@@ -94,14 +97,14 @@ Intersection Intersection::union_intersection(Intersection &other) {
       startPoint = p;
     }
     if (lastCounter == 1 && counter == 0) {
-      newIntersection.addRange(new Range(*startPoint, *p));
+      newIntersection->addRange(new Range(*startPoint, *p));
     }
   }
 
   return newIntersection;
 }
 
-Intersection Intersection::difference_intersection(Intersection &other) {
+Intersection* Intersection::difference_intersection(Intersection *other) {
   vector<Intersection::Point*> points;
   for (Range *r : ranges) {
     Intersection::Point *p1 = new Point(r->start, -1, r->s_normal, r->s_mat, r->s_inv);
@@ -109,7 +112,7 @@ Intersection Intersection::difference_intersection(Intersection &other) {
     points.push_back(p1);
     points.push_back(p2);
   }
-  for (Range *r : (other.ranges)) {
+  for (Range *r : (other->ranges)) {
     Intersection::Point *p1 = new Point(r->start, 0, r->s_normal, r->s_mat, r->s_inv);
     Intersection::Point *p2 = new Point(r->end, 2, r->e_normal, r->e_mat, r->e_inv);
     points.push_back(p1);
@@ -119,7 +122,7 @@ Intersection Intersection::difference_intersection(Intersection &other) {
 
   int counter = 0;
   Point *startPoint = nullptr;
-  Intersection newIntersection;
+  Intersection *newIntersection = new Intersection();
   for (Intersection::Point *p : points) {
     if (p->position == 0 || p->position == -1) {
       counter ++;
@@ -135,11 +138,11 @@ Intersection Intersection::difference_intersection(Intersection &other) {
     }
 
     if (p->position == 0 && counter > 1) {
-      newIntersection.addRange(new Range(*startPoint, *p));
+      newIntersection->addRange(new Range(*startPoint, *p));
     }
 
     if (p->position == 1 && counter == 0) {
-      newIntersection.addRange(new Range(*startPoint, *p));
+      newIntersection->addRange(new Range(*startPoint, *p));
     }
   }
 
