@@ -88,6 +88,7 @@ Intersection::Range* NonhierSphere::intersect(Ray &ray, bool checkBound) {
   r->s_normal = pNormalMin;
   r->e_normal = -pNormalMax;
   r->hit = true;
+
   return r;
 }
 

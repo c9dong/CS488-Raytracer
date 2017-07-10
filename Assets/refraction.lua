@@ -5,7 +5,7 @@ green_mat = gr.material({0.0, 1.0, 0.0}, {0.5, 0.5, 0.5}, 25);
 blue_mat = gr.material({0.0, 0.0, 1.0}, {0.5, 0.5, 0.5}, 25);
 grey_mat = gr.material({0.9, 0.9, 0.9}, {0.5, 0.5, 0.5}, 25);
 
-trans_mat = gr.transparent_material(0.9, 0.1, 1.2);
+trans_mat = gr.transparent_material(0.9, 0.1, 1.3);
 
 scene = gr.node( 'scene' )
 scene:translate(0, 0, -15)

@@ -92,7 +92,7 @@ void *createImagePart(void *arguments) {
             for (float y_eye_delta=-camera_rad; y_eye_delta<=camera_rad; y_eye_delta+=camera_sample) {
               vec3 new_p = vec3(p_world.x + x_eye_delta, p_world.y + y_eye_delta, p_world.z);
               vec3 r_f_origin = new_p;
-              vec3 r_f_direction = focalPoint - r_f_origin;
+              vec3 r_f_direction = glm::normalize(focalPoint - r_f_origin);
               Ray ray(r_f_origin, r_f_direction);
               vec3 background = raytrace->getBackgroundColor(ray);
               final_col += raytrace->getRayColor(ray, background, 0, nullptr);
@@ -235,29 +235,29 @@ glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit, M
     if ((tMat = dynamic_cast<TransparentMaterial*>(hit.mat))) {
       if (maxHit < 10) {
         float kr = 1.0f / tMat->refractIdx;
-        vec3 origin = hit.pHit - hit.pNormal*0.1f;
+        vec3 origin = hit.pHit - hit.pNormal*0.01f;
         vec3 refract_direction = getRefractAngle(ray.direction, hit.pNormal, kr);
         Ray refractRay(origin, refract_direction);
         Intersection *internal_intersection = root->intersect(refractRay, false);
         Intersection::Hit internalHit = internal_intersection->getFirstHit(refractRay);
         delete internal_intersection;
-        vec3 internal_origin = internalHit.pHit - internalHit.pNormal*0.1f;
-        vec3 internal_refract_direction = getRefractAngle(refractRay.direction, internalHit.pNormal, kr);
+        vec3 internal_origin = internalHit.pHit - internalHit.pNormal*0.01f;
+        vec3 internal_refract_direction = getRefractAngle(refractRay.direction, internalHit.pNormal, tMat->refractIdx);
         Ray newRefractRay(internal_origin, internal_refract_direction);
         int new_maxHit = maxHit + 1;
         vec3 refractColor;
         refractColor = getRayColor(newRefractRay, background, new_maxHit, nullptr);
-        // return refractColor;
+        return refractColor;
 
-        vec3 reflect_origin = hit.pHit + hit.pNormal*0.1f;
-        vec3 reflect_direction = getReflectionAngle(ray.direction, hit.pNormal);
-        Ray reflectRay(reflect_origin, reflect_direction);
-        vec3 reflectColor;
-        reflectColor = getRayColor(reflectRay, background, new_maxHit, nullptr);
-        return refractColor * float(tMat->transmittance) + reflectColor * float(tMat->reflectivity);
+        // vec3 reflect_origin = hit.pHit + hit.pNormal*0.0001f;
+        // vec3 reflect_direction = getReflectionAngle(ray.direction, hit.pNormal);
+        // Ray reflectRay(reflect_origin, reflect_direction);
+        // vec3 reflectColor;
+        // reflectColor = getRayColor(reflectRay, background, new_maxHit, nullptr);
+        // return refractColor * float(tMat->transmittance) + reflectColor * float(tMat->reflectivity);
       } else {
         cout << "dfd" << endl;
-        Ray forwardRay = Ray(hit.pHit + ray.direction*0.1f, ray.direction);
+        Ray forwardRay = Ray(hit.pHit + ray.direction*0.01f, ray.direction);
         col = getRayColor(forwardRay, background, maxHit, tMat);
       }
     } else {
@@ -333,12 +333,14 @@ double RayTrace::getAntiSampleRate() {
 }
 
 glm::vec3 RayTrace::getRefractAngle(glm::vec3 direction, glm::vec3 normal, float kr) {
-  float d_dot_n = -glm::dot(glm::normalize(direction), glm::normalize(normal));
+  assert(abs(glm::dot(normal, normal) - 1.0f) < 0.00001);
+  assert(abs(glm::dot(direction, direction) - 1.0f) < 0.00001);
+  float d_dot_n = glm::dot((direction), (normal));
   float root = 1.0f - kr*kr*(1.0f - d_dot_n*d_dot_n);
   if (root < 0) {
     assert(false);
   }
-  vec3 res = kr * glm::normalize(direction) + (kr * d_dot_n - sqrt(root)) * glm::normalize(normal);
+  vec3 res = (-kr * d_dot_n - sqrt(root)) * (normal) + kr * (direction);
   return res;
 }
 
