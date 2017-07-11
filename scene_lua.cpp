@@ -524,8 +524,9 @@ int gr_cube_texture_cmd(lua_State* L)
   data->material = 0;
 
   const char* name = luaL_checkstring(L, 1);
+  double shininess = luaL_checknumber(L, 2);
   
-  data->material = new CubeTextureMaterial(name);
+  data->material = new CubeTextureMaterial(name, shininess);
 
   luaL_newmetatable(L, "gr.material");
   lua_setmetatable(L, -2);
@@ -542,8 +543,9 @@ int gr_sphere_texture_cmd(lua_State* L)
   data->material = 0;
 
   const char* name = luaL_checkstring(L, 1);
+  double shininess = luaL_checknumber(L, 2);
   
-  data->material = new SphereTextureMaterial(name);
+  data->material = new SphereTextureMaterial(name, shininess);
 
   luaL_newmetatable(L, "gr.material");
   lua_setmetatable(L, -2);

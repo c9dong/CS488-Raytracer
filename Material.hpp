@@ -13,8 +13,9 @@ public:
   virtual glm::vec3 getColor(glm::vec3 pHit, 
     glm::vec3 pNormal, 
     Light *light,
-    glm::mat4 inv,
-    Material *lastMat);
+    glm::mat4 inv);
+
+  glm::vec3 calcPhongShading(glm::vec3 pHit, glm::vec3 pNormal, glm::vec3 kd, glm::vec3 ks, float shininess, Light *light);
 
   double refractIdx;
 };

@@ -8,5 +8,5 @@ class UnionNode : public SceneNode {
 public:
   UnionNode( const std::string & name );
 
-  Intersection* intersect(Ray & ray, bool checkBound);
+  Intersection* intersect(Ray & ray, bool checkBound, glm::mat4 lastInv);
 };

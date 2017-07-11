@@ -112,14 +112,14 @@ int SceneNode::totalSceneNodes() const {
 	return nodeInstanceCount;
 }
 
-Intersection* SceneNode::intersect(Ray &ray, bool checkBound) {
+Intersection* SceneNode::intersect(Ray &ray, bool checkBound, glm::mat4 lastInv) {
 	Intersection *minIntersection = new Intersection();
 	vec3 inv_origin = vec3(invtrans * vec4(ray.origin, 1));
 	vec3 inv_direction = glm::normalize(vec3(invtrans * vec4(ray.direction, 0)));
 	Ray inverseRay(inv_origin, inv_direction);
 	
 	for (SceneNode *child : children) {
-		Intersection *i = child->intersect(inverseRay, checkBound);
+		Intersection *i = child->intersect(inverseRay, checkBound, invtrans * lastInv);
 		Intersection *temp = minIntersection;
 		// default union
 		minIntersection = temp->union_intersection(i);

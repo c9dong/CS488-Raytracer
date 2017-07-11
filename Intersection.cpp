@@ -64,6 +64,10 @@ Intersection* Intersection::intersect_intersection(Intersection *other) {
     }
   }
 
+  for (Intersection::Point *p : points) {
+    delete p;
+  }
+
   return newIntersection;
 }
 
@@ -99,6 +103,10 @@ Intersection* Intersection::union_intersection(Intersection *other) {
     if (lastCounter == 1 && counter == 0) {
       newIntersection->addRange(new Range(*startPoint, *p));
     }
+  }
+
+  for (Intersection::Point *p : points) {
+    delete p;
   }
 
   return newIntersection;
@@ -144,6 +152,10 @@ Intersection* Intersection::difference_intersection(Intersection *other) {
     if (p->position == 1 && counter == 0) {
       newIntersection->addRange(new Range(*startPoint, *p));
     }
+  }
+
+  for (Intersection::Point *p : points) {
+    delete p;
   }
 
   return newIntersection;

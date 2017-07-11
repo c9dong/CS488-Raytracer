@@ -10,7 +10,8 @@
 using namespace glm;
 using namespace std;
 
-TextureMaterial::TextureMaterial(const std::string & file_name) {
+TextureMaterial::TextureMaterial(const std::string & file_name, double m_shininess)
+   : m_shininess(m_shininess) {
   image = new vector<unsigned char>();
   unsigned error = lodepng::decode(*image, width, height, file_name.c_str());
 }

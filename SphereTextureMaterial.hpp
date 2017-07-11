@@ -6,7 +6,7 @@
 
 class SphereTextureMaterial : public TextureMaterial {
 public:
-  SphereTextureMaterial(const std::string & file_name);
+  SphereTextureMaterial(const std::string & file_name, double m_shininess);
   virtual ~SphereTextureMaterial();
 
   glm::vec3 getColor(glm::vec3 pHit, 

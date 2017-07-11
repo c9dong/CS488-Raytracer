@@ -2,11 +2,11 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "PhongMaterial.hpp"
+#include "Material.hpp"
 
-class TextureMaterial : public PhongMaterial {
+class TextureMaterial : public Material {
 public:
-  TextureMaterial(const std::string & file_name);
+  TextureMaterial(const std::string & file_name, double m_shininess);
   virtual ~TextureMaterial();
 
   glm::vec3 getColor(glm::vec3 pHit, 
@@ -19,5 +19,7 @@ public:
   std::vector<unsigned char> *image;
   unsigned width;
   unsigned height;
+
+  double m_shininess;
 
 };

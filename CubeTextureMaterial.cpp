@@ -11,7 +11,8 @@
 using namespace glm;
 using namespace std;
 
-CubeTextureMaterial::CubeTextureMaterial(const std::string & file_name) : TextureMaterial(file_name) {}
+CubeTextureMaterial::CubeTextureMaterial(const std::string & file_name, double m_shininess)
+ : TextureMaterial(file_name, m_shininess) {}
 
 CubeTextureMaterial::~CubeTextureMaterial()
 {}
@@ -20,22 +21,30 @@ glm::vec3 CubeTextureMaterial::getColor(glm::vec3 pHit,
     glm::vec3 pNormal, 
     Light *light,
     glm::mat4 inv) {
-
-  pHit = vec3(inv * vec4(pHit, 1.0f));
+  vec3 r_pNormal = glm::normalize(glm::transpose((mat3(glm::inverse(inv)))) * pNormal);
+  vec3 r_pHit = vec3(inv * vec4(pHit, 1.0f));
   float x;
   float y;
-  if (pNormal.x == abs(1.0f)) {
-    x = -pHit.z;
-    y = pHit.y + 0.5;
-  } else if (pNormal.y == abs(1.0f)) {
-    x = -pHit.z;
-    y = pHit.x + 0.5;
+  if (isZero(fabs(r_pNormal.x) - 1.0f)) {
+    x = r_pHit.z;
+    y = r_pHit.y;
+  } else if (isZero(fabs(r_pNormal.y) - 1.0f)) {
+    x = r_pHit.x;
+    y = r_pHit.z;
+  } else if (isZero(fabs(r_pNormal.z) - 1.0f)) {
+    x = r_pHit.x;
+    y = r_pHit.y;
   } else {
-    x = pHit.x + 0.5;
-    y = pHit.y + 0.5;
+    printVec3(r_pNormal);
+    assert(false);
   }
+
+  x += 0.5;
+  y += 0.5;
+
   float u = x;
   float v = 1.0f - y;
+  int index = 0;
 
   float di = (width - 1.0f) * u;
   float dj = (height - 1.0f) * v;
@@ -51,28 +60,8 @@ glm::vec3 CubeTextureMaterial::getColor(glm::vec3 pHit,
   vec3 c10 = colorAt(i+1, j);
   vec3 c11 = colorAt(i+1, j+1);
 
-  return c00 * (1-up) * (1-vp) + c01 * (1-up) * vp + c10 * up * (1-vp) + c11 * up * vp;
-  // m_shininess = 25.0f;
+  vec3 m_kd = c00 * (1-up) * (1-vp) + c01 * (1-up) * vp + c10 * up * (1-vp) + c11 * up * vp;
+  vec3 m_ks = vec3(0);
 
-  // vec3 l = normalize(light->position - vec3(pHit));
-
-  // vec3 v2 = -normalize(vec3(pHit));
-
-  // float n_dot_l = glm::max(dot(pNormal, l), 0.0f);
-
-  // vec3 diffuse;
-  // diffuse = m_kd * n_dot_l;
-
-  // vec3 specular = vec3(0.0);
-
-  // if (n_dot_l > 0.0) {
-  //   vec3 h = normalize(v2 + l);
-  //   float n_dot_h = glm::max(dot(vec3(pNormal), h), 0.0f);
-
-  //   specular = m_ks * pow(n_dot_h, m_shininess);
-  // }
-
-  // vec3 col = light->colour * (diffuse + specular);
-
-  // return col;
+  return calcPhongShading(pHit, pNormal, m_kd, m_ks, m_shininess, light);
 }

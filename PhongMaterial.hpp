@@ -13,8 +13,7 @@ public:
   glm::vec3 getColor(glm::vec3 pHit, 
     glm::vec3 pNormal, 
     Light *light,
-    glm::mat4 inv,
-    Material *lastMat);
+    glm::mat4 inv);
 
   glm::vec3 m_kd;
   glm::vec3 m_ks;

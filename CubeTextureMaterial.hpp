@@ -6,7 +6,7 @@
 
 class CubeTextureMaterial : public TextureMaterial {
 public:
-  CubeTextureMaterial(const std::string & file_name);
+  CubeTextureMaterial(const std::string & file_name, double m_shininess);
   virtual ~CubeTextureMaterial();
 
   glm::vec3 getColor(glm::vec3 pHit, 
