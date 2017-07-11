@@ -61,6 +61,36 @@ scene:add_child(sphere4)
 sphere4:set_material(red_mat)
 sphere4:translate(4, -3, -7)
 
+sphere5 = gr.sphere('sphere5')
+scene:add_child(sphere5)
+sphere5:set_material(green_mat)
+sphere5:translate(0, -1, -7)
+
+sphere6 = gr.sphere('sphere6')
+scene:add_child(sphere6)
+sphere6:set_material(blue_mat)
+sphere6:translate(-4, -1, -7)
+
+sphere7 = gr.sphere('sphere7')
+scene:add_child(sphere7)
+sphere7:set_material(red_mat)
+sphere7:translate(4, -1, -7)
+
+sphere8 = gr.sphere('sphere8')
+scene:add_child(sphere8)
+sphere8:set_material(green_mat)
+sphere8:translate(0, 1, -7)
+
+sphere9 = gr.sphere('sphere9')
+scene:add_child(sphere9)
+sphere9:set_material(blue_mat)
+sphere9:translate(-4, 1, -7)
+
+sphere10 = gr.sphere('sphere10')
+scene:add_child(sphere10)
+sphere10:set_material(red_mat)
+sphere10:translate(4, 1, -7)
+
 
 white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
