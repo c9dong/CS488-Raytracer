@@ -59,6 +59,9 @@
 #include "UnionNode.hpp"
 #include "IntersectNode.hpp"
 #include "DifferenceNode.hpp"
+#include "Bump.hpp"
+
+using namespace std;
 
 typedef std::map<std::string,Mesh*> MeshMap;
 static MeshMap mesh_map;
@@ -597,6 +600,27 @@ int gr_node_set_material_cmd(lua_State* L)
   return 0;
 }
 
+extern "C"
+int gr_node_set_bump_cmd(lua_State* L)
+{
+  GRLUA_DEBUG_CALL;
+  gr_material_ud* selfdata = (gr_material_ud*)luaL_checkudata(L, 1, "gr.material");
+  luaL_argcheck(L, selfdata != 0, 1, "Material expected");
+
+  Material* self = dynamic_cast<Material*>(selfdata->material);
+
+  luaL_argcheck(L, self != 0, 1, "Material expected");
+  
+  const char* filename = luaL_checkstring(L, 2);
+  luaL_argcheck(L, filename != 0, 2, "String expected");
+
+  Bump* b = new Bump(filename);
+
+  self->setBump(b);
+
+  return 0;
+}
+
 // Add a scaling transformation to a node.
 extern "C"
 int gr_node_scale_cmd(lua_State* L)
@@ -738,6 +762,11 @@ static const luaL_Reg grlib_node_methods[] = {
   {0, 0}
 };
 
+static const luaL_Reg grlib_mat_methods[] = {
+  {"add_bump", gr_node_set_bump_cmd},
+  {0, 0}
+};
+
 // This function calls the lua interpreter to define the scene and
 // raytrace it as appropriate.
 bool run_lua(const std::string& filename)
@@ -753,6 +782,14 @@ bool run_lua(const std::string& filename)
   luaL_openlibs(L);
 
   GRLUA_DEBUG("Setting up our functions");
+
+  // Set up the metatable for gr.node
+  luaL_newmetatable(L, "gr.material");
+  lua_pushstring(L, "__index");
+  lua_pushvalue(L, -2);
+  lua_settable(L, -3);
+
+  luaL_setfuncs( L, grlib_mat_methods, 0 );
 
   // Set up the metatable for gr.node
   luaL_newmetatable(L, "gr.node");

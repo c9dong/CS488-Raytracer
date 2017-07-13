@@ -17,6 +17,16 @@ SphereTextureMaterial::SphereTextureMaterial(const std::string & file_name, doub
 SphereTextureMaterial::~SphereTextureMaterial()
 {}
 
+int clamp(int s, int e, int n) {
+  if (n < s) {
+    n = s;
+  }
+  if (n > e) {
+    n = e;
+  }
+  return n;
+}
+
 glm::vec3 SphereTextureMaterial::getColor(glm::vec3 pHit, 
     glm::vec3 pNormal, 
     Light *light,
@@ -45,5 +55,9 @@ glm::vec3 SphereTextureMaterial::getColor(glm::vec3 pHit,
   vec3 m_kd = c00 * (1-up) * (1-vp) + c01 * (1-up) * vp + c10 * up * (1-vp) + c11 * up * vp;
   vec3 m_ks = vec3(0.5, 0.5, 0.5);
 
-  return calcPhongShading(pHit, pNormal, m_kd, m_ks, m_shininess, light);
+  // bump
+  vec3 newNormal = this->bump->getNormal(r_pNormal, u, v);
+  vec3 invNewNormal = glm::normalize(glm::vec3(glm::inverse(inv) * glm::vec4(newNormal, 0)));
+  return calcPhongShading(pHit, invNewNormal, m_kd, m_ks, m_shininess, light);
+
 }

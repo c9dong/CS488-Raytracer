@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 
+#include "Bump.hpp"
 #include "Light.hpp"
 
 class Material {
@@ -17,5 +18,8 @@ public:
 
   glm::vec3 calcPhongShading(glm::vec3 pHit, glm::vec3 pNormal, glm::vec3 kd, glm::vec3 ks, float shininess, Light *light);
 
+  void setBump(Bump *bump);
+
+  Bump *bump;
   double refractIdx;
 };

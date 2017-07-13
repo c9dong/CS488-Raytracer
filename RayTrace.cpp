@@ -13,7 +13,7 @@
 using namespace glm;
 using namespace std;
 
-#define NUM_THREAD_ROOT_2 4
+#define NUM_THREAD_ROOT_2 1
 
 // #define REFLECTION
 // #define REFRACTION

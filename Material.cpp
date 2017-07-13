@@ -3,10 +3,10 @@
 using namespace std;
 using namespace glm;
 
-Material::Material() : refractIdx(1.0)
+Material::Material() : Material(1.0)
 {}
 
-Material::Material(double refractIdx) : refractIdx(refractIdx)
+Material::Material(double refractIdx) : refractIdx(refractIdx), bump(new NoBump("a"))
 {}
 
 Material::~Material()
@@ -41,4 +41,8 @@ glm::vec3 Material::calcPhongShading(glm::vec3 pHit, glm::vec3 pNormal, glm::vec
   vec3 col = light->colour * (diffuse + specular);
 
   return col;
+}
+
+void Material::setBump(Bump *bump) {
+  this->bump = bump;
 }

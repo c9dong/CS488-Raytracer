@@ -63,5 +63,8 @@ glm::vec3 CubeTextureMaterial::getColor(glm::vec3 pHit,
   vec3 m_kd = c00 * (1-up) * (1-vp) + c01 * (1-up) * vp + c10 * up * (1-vp) + c11 * up * vp;
   vec3 m_ks = vec3(0);
 
-  return calcPhongShading(pHit, pNormal, m_kd, m_ks, m_shininess, light);
+  // bump
+  vec3 newNormal = this->bump->getNormal(r_pNormal, u, v);
+  vec3 invNewNormal = glm::normalize(glm::vec3(glm::inverse(inv) * glm::vec4(newNormal, 0)));
+  return calcPhongShading(pHit, invNewNormal, m_kd, m_ks, m_shininess, light);
 }

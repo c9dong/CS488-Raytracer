@@ -9,6 +9,7 @@ wood_mat = gr.cube_texture('Assets/wood.png', 25)
 mat_ball_13 = gr.sphere_texture('Assets/ball13.png', 50)
 mat_ball_2 = gr.sphere_texture('Assets/ball2.png', 50)
 mat_ball_15 = gr.sphere_texture('Assets/ball15.png', 50)
+mat_ball_15:add_bump('Assets/waterbump.png')
 
 red_mat = gr.material({1.0, 0.0, 0.0}, {0.5, 0.5, 0.5}, 25);
 green_mat = gr.material({0.0, 1.0, 0.0}, {0.5, 0.5, 0.5}, 25);
@@ -175,18 +176,20 @@ ball2:rotate('X', -22)
 ball2:rotate('Y', 80)
 ball2:translate(-0.1, 0.15, 0.15)
 
-ball15 = gr.sphere('ball15')
+ball15 = gr.cube('ball15')
 pool_table_full:add_child(ball15)
 ball15:set_material(mat_ball_15)
-ball15:scale(0.1, 0.1, 0.1)
-ball15:rotate('X', 15)
-ball15:rotate('Z', 14)
+ball15:scale(1, 1, 1)
+ball15:rotate('Y', -90)
+ball15:rotate('X', -24)
 ball15:translate(0.2, 0.15, 0.15)
 
-scene:add_child(pool_table_full)
+scene:add_child(ball15)
+
+-- scene:add_child(pool_table_full)
 
 
-white_light_1 = gr.light({0, 4, -12}, {0.75, 0.75, 0.75}, {1, 0, 0})
+white_light_1 = gr.light({0, 0.15, -10}, {0.75, 0.75, 0.75}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
 gr.render(scene, 'results/nonhier.png', 500, 500,
