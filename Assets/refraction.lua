@@ -46,6 +46,11 @@ sphere1:set_material(trans_mat)
 sphere1:scale(2, 2, 2)
 sphere1:translate(1, -2, 2)
 
+s2 = gr.sphere('s2')
+scene:add_child(s2)
+s2:set_material(trans_mat)
+s2:translate(-2, -2, 5)
+
 sphere2 = gr.sphere('sphere2')
 scene:add_child(sphere2)
 sphere2:set_material(green_mat)
@@ -95,7 +100,7 @@ sphere10:translate(4, 1, -7)
 white_light_1 = gr.light({0, 4, -12}, {0.5, 0.5, 0.5}, {1, 0, 0})
 white_light_2 = gr.light({0, 0, 15}, {0.5, 0.5, 0.5}, {1, 0, 0})
 
-gr.render(scene, 'results/refraction.png', 500, 500,
+gr.render(scene, 'results/refraction.png', 256, 256,
     {0, 0, 0}, {0, 0, -1}, {0, 1, 0}, 50,
     {0.1, 0.1, 0.1}, {white_light_1}, 
     -- focal dist
@@ -105,7 +110,7 @@ gr.render(scene, 'results/refraction.png', 500, 500,
     -- camera sample rate (0 for infinite loop)
     0.2,
     -- anti aliasing sample radius (0 for no sample)
-    0,
+    0.5,
     -- anti aliasing sample rate (0 for infinite loop)
     0.5)
 

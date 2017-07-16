@@ -3,6 +3,7 @@ import sys
 import math
 import png
 import os
+import time
 
 file_name = sys.argv[1]
 threads = int(sys.argv[2])
@@ -32,10 +33,12 @@ for i in range(threads):
       result_name)
     args_arr.append(args)
 
+start = time.time()
+
 cur = 0
 total = len(args_arr)
 print total
-MAX_THREAD = min(10, total_threads)
+MAX_THREAD = min(20, total_threads)
 while(cur < total):
   processes = []
   for i in range(MAX_THREAD):
@@ -44,13 +47,19 @@ while(cur < total):
     args = args_arr[cur + i]
     print "starting thread: " + args[6]
     print args
-    popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+    popen = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     processes.append(popen)
   for p in processes:
     p.wait()
     output = p.stdout.read()
+    error = p.stderr.read()
     print output
+    print error
   cur += MAX_THREAD
+
+end = time.time()
+
+print 'time taken: ' + str(end - start)
 
 img_arr = [[0 for _ in range(width*3)] for __ in range(height)]
 
@@ -78,7 +87,6 @@ for arg in args_arr:
       img_arr[y][3*x] = rgb[0]
       img_arr[y][3*x+1] = rgb[1]
       img_arr[y][3*x+2] = rgb[2]
-  os.remove(f_name)
 
 
 result = './results' + file_name[file_name.rfind('/'):file_name.rfind('.')] + '.png'
@@ -86,3 +94,7 @@ r = open(result, 'wb')
 w = png.Writer(width, height)
 w.write(r, img_arr)
 r.close()
+
+for arg in args_arr:
+  f_name = arg[9]
+  os.remove(f_name)

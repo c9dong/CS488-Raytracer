@@ -73,7 +73,7 @@ gr.render(scene, 'results/depth.png', 256, 256,
     -- focal dist
     -15, 
     -- camera radius (0 for point)
-    1.0, 
+    0, 
     -- camera sample rate (0 for infinite loop)
     0.2,
     -- anti aliasing sample radius (0 for no sample)

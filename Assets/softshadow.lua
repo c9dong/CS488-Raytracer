@@ -1,12 +1,5 @@
 -- Soft shadow testing script
 
-mat1 = gr.material({0.7, 1.0, 0.7}, {0.5, 0.7, 0.5}, 25)
-mat2 = gr.material({0.1, 0.5, 0.5}, {0.5, 0.7, 0.5}, 25)
-mat3 = gr.material({1.0, 0.6, 0.1}, {0.5, 0.7, 0.5}, 25)
-mat4 = gr.material({0.7, 0.6, 1.0}, {0.5, 0.4, 0.8}, 25)
-mat5 = gr.cube_texture('Assets/basketball.png')
-mat6 = gr.sphere_texture('Assets/world.png')
-
 red_mat = gr.material({1.0, 0.0, 0.0}, {0.5, 0.5, 0.5}, 25);
 green_mat = gr.material({0.0, 1.0, 0.0}, {0.5, 0.5, 0.5}, 25);
 blue_mat = gr.material({0.0, 0.0, 1.0}, {0.5, 0.5, 0.5}, 25);
@@ -73,6 +66,6 @@ gr.render(scene, 'results/softshadow.png', 256, 256,
     -- camera sample rate (0 for infinite loop)
     0.2,
     -- anti aliasing sample radius (0 for no sample)
-    0,
+    0.5,
     -- anti aliasing sample rate (0 for infinite loop)
     0.5)

@@ -146,11 +146,11 @@ Intersection* Intersection::difference_intersection(Intersection *other) {
       startPoint = p;
     }
 
-    if (p->position == 0 && counter > 1) {
+    if (p->position == 0 && counter > 1 && startPoint != nullptr) {
       newIntersection->addRange(new Range(*startPoint, *p));
     }
 
-    if (p->position == 1 && counter == 0) {
+    if (p->position == 1 && counter == 0 && startPoint != nullptr) {
       newIntersection->addRange(new Range(*startPoint, *p));
     }
   }

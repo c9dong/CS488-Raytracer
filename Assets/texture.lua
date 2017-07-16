@@ -158,6 +158,6 @@ gr.render(scene, 'results/texture.png', 500, 500,
     -- camera sample rate (0 for infinite loop)
     0.2,
     -- anti aliasing sample radius (0 for no sample)
-    0,
+    0.5,
     -- anti aliasing sample rate (0 for infinite loop)
     0.5)
