@@ -1,5 +1,7 @@
 #include "RayTrace.hpp"
 
+#include <glm/ext.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <pthread.h>
 
@@ -13,10 +15,7 @@
 using namespace glm;
 using namespace std;
 
-#define NUM_THREAD_ROOT_2 1
-
-// #define REFLECTION
-// #define REFRACTION
+#define NUM_THREAD_ROOT_2 4
 
 RayTrace::RayTrace(
     SceneNode * root,
@@ -32,7 +31,12 @@ RayTrace::RayTrace(
     double camera_radius,
     double camera_sample_rate,
     double anti_sample_radius,
-    double anti_sample_rate)
+    double anti_sample_rate,
+    int x_start,
+    int y_start,
+    int x_size,
+    int y_size,
+    int id)
     : root(root), 
       image(image), 
       eye(eye),
@@ -46,14 +50,19 @@ RayTrace::RayTrace(
       camera_radius(camera_radius),
       camera_sample_rate(camera_sample_rate),
       anti_sample_radius(anti_sample_radius),
-      anti_sample_rate(anti_sample_rate)
+      anti_sample_rate(anti_sample_rate),
+      x_start(x_start),
+      y_start(y_start),
+      x_size(x_size),
+      y_size(y_size),
+      id(id)
 {
 
 }
 
 RayTrace::~RayTrace() {}
 
-void *createImagePart(void *arguments) {
+void createImagePart(void *arguments) {
   RayTrace::GenerateArg *arg = (RayTrace::GenerateArg *)arguments;
   int x_start = arg->x_start;
   int x_size = arg->x_size;
@@ -69,6 +78,7 @@ void *createImagePart(void *arguments) {
 
   for (int x=x_start; x<std::min(x_start+x_size, x_max); x++) {
     for (int y=y_start; y<std::min(y_start+y_size, y_max); y++) {
+      cout << x << " " << y << endl;
       vec3 col = vec3(0);
       for (float x_delta=-anti_sample_radius; x_delta<=anti_sample_radius; x_delta+=anti_sample_rate) {
         for (float y_delta=-anti_sample_radius; y_delta<=anti_sample_radius; y_delta+=anti_sample_rate) {
@@ -116,7 +126,7 @@ void *createImagePart(void *arguments) {
       raytrace->getImage()(x, y, 2) = col.b;
     }
   }
-  pthread_exit(NULL);
+  // pthread_exit(NULL);
 }
 
 Image& RayTrace::getImage() {
@@ -124,6 +134,12 @@ Image& RayTrace::getImage() {
 }
 
 const glm::vec3& RayTrace::getEye() {
+  // mat4 m1 = glm::rotate(degreesToRadians(45.0f), vec3(1.0f, 0.0f, 0.0f));
+  // mat4 m2 = glm::rotate(degreesToRadians(35.0f), vec3(0.0f, 1.0f, 0.0f));
+  // vec4 v = vec4(0.0f, 0.0f, 10.0f, 1.0f);
+  // mat4 t = m1*m2;
+  // vec3 vvv =  vec3(t * v);
+  // printVec3(vvv);
   return eye;
 }
 
@@ -133,32 +149,48 @@ void RayTrace::generateImage() {
 
   mat4 p_to_world = getPointToWorldMatrix();
 
-  int h_size = int(ceil(float(h) / NUM_THREAD_ROOT_2));
-  int w_size = int(ceil(float(w) / NUM_THREAD_ROOT_2));
+  GenerateArg *args = new GenerateArg();
+  args->x_start = x_start;
+  args->x_size = x_size;
+  args->x_max = int(w);
+  args->y_start = y_start;
+  args->y_size = y_size;
+  args->y_max = int(h);
+  args->world_mat = p_to_world;
+  args->raytrace = this;
 
-  pthread_t threads[NUM_THREAD_ROOT_2 * NUM_THREAD_ROOT_2];
-  for (int i=0; i<NUM_THREAD_ROOT_2; i++) {
-    for (int j=0; j<NUM_THREAD_ROOT_2; j++) {
-      GenerateArg *args = new GenerateArg();
-      args->x_start = i * w_size;
-      args->x_size = w_size;
-      args->x_max = int(w);
-      args->y_start = j * h_size;
-      args->y_size = h_size;
-      args->y_max = int(h);
-      args->world_mat = p_to_world;
-      args->raytrace = this;
+  createImagePart((void *)args);
 
-      int rc = pthread_create(&threads[i*NUM_THREAD_ROOT_2+j], NULL, createImagePart, (void *)args);
-      if (rc){
-         cout << "Error:unable to create thread," << rc << endl;
-         exit(-1);
-      }
-    }
-  }
-  for (int i=0; i<NUM_THREAD_ROOT_2*NUM_THREAD_ROOT_2; i++) {
-    pthread_join(threads[i], NULL);
-  }
+
+  // int h_size = int(ceil(float(h) / NUM_THREAD_ROOT_2));
+  // int w_size = int(ceil(float(w) / NUM_THREAD_ROOT_2));
+
+  // pthread_t threads[NUM_THREAD_ROOT_2 * NUM_THREAD_ROOT_2];
+  // for (int i=0; i<NUM_THREAD_ROOT_2; i++) {
+  //   for (int j=0; j<NUM_THREAD_ROOT_2; j++) {
+  //     GenerateArg *args = new GenerateArg();
+  //     args->x_start = i * w_size;
+  //     args->x_size = w_size;
+  //     args->x_max = int(w);
+  //     args->y_start = j * h_size;
+  //     args->y_size = h_size;
+  //     args->y_max = int(h);
+  //     args->world_mat = p_to_world;
+  //     args->raytrace = this;
+
+  //     createImagePart((void *)args);
+
+  //     // int rc = pthread_create(&threads[i*NUM_THREAD_ROOT_2+j], NULL, createImagePart, (void *)args);
+  //     // if (rc){
+  //     //    cout << "Error:unable to create thread," << rc << endl;
+  //     //    exit(-1);
+  //     // }
+  //     delete args;
+  //   }
+  // }
+  // for (int i=0; i<NUM_THREAD_ROOT_2*NUM_THREAD_ROOT_2; i++) {
+  //   pthread_join(threads[i], NULL);
+  // }
 }
 
 mat4 RayTrace::getPointToWorldMatrix() {
@@ -190,40 +222,43 @@ mat4 RayTrace::getPointToWorldMatrix() {
   return T2 * R * S * T1;
 }
 
-glm::vec3 RayTrace::getRayColor(Ray & ray, glm::vec3 & background, int maxHit, Material *lastMat) {
+glm::vec3 RayTrace::getRayColor(Ray &ray, glm::vec3 & background, int maxHit, Material *lastMat) {
   Intersection *intersection = root->intersect(ray, false, mat4(1));
   vec3 col;
-  Intersection::Hit hit = intersection->getFirstHit(ray);
+  Intersection::Hit hit = intersection->getFirstHit(ray, false);
   delete intersection;
   if (hit.hit) {
     col = ambient;
     TransparentMaterial *tMat;
     if ((tMat = dynamic_cast<TransparentMaterial*>(hit.mat))) {
       if (maxHit < 10) {
-        float kr = 1.0f / tMat->refractIdx;
-        vec3 origin = hit.pHit - hit.pNormal*0.01f;
-        vec3 refract_direction = getRefractAngle(ray.direction, hit.pNormal, kr);
-        Ray refractRay(origin, refract_direction);
-        Intersection *internal_intersection = root->intersect(refractRay, false, mat4(1));
-        Intersection::Hit internalHit = internal_intersection->getFirstHit(refractRay);
-        delete internal_intersection;
-        vec3 internal_origin = internalHit.pHit - internalHit.pNormal*0.01f;
-        vec3 internal_refract_direction = getRefractAngle(refractRay.direction, internalHit.pNormal, tMat->refractIdx);
-        Ray newRefractRay(internal_origin, internal_refract_direction);
         int new_maxHit = maxHit + 1;
-        vec3 refractColor;
-        refractColor = getRayColor(newRefractRay, background, new_maxHit, nullptr);
-        return refractColor;
-
-        // vec3 reflect_origin = hit.pHit + hit.pNormal*0.0001f;
-        // vec3 reflect_direction = getReflectionAngle(ray.direction, hit.pNormal);
-        // Ray reflectRay(reflect_origin, reflect_direction);
-        // vec3 reflectColor;
-        // reflectColor = getRayColor(reflectRay, background, new_maxHit, nullptr);
-        // return refractColor * float(tMat->transmittance) + reflectColor * float(tMat->reflectivity);
+        if (tMat->transmittance != 0) {
+          float kr = 1.0f / tMat->refractIdx;
+          vec3 origin = hit.pHit - hit.pNormal*0.01f;
+          vec3 refract_direction = getRefractAngle(ray.direction, hit.pNormal, kr);
+          Ray refractRay(origin, refract_direction);
+          vec3 refractColor;
+          // refractColor = getRayColor(refractRay, background, new_maxHit, nullptr);
+          Intersection *internal_intersection = root->intersect(refractRay, false, mat4(1));
+          Intersection::Hit internalHit = internal_intersection->getFirstHit(refractRay, false);
+          delete internal_intersection;
+          vec3 internal_origin = internalHit.pHit - internalHit.pNormal*0.01f;
+          vec3 internal_refract_direction = getRefractAngle(refractRay.direction, internalHit.pNormal, tMat->refractIdx);
+          Ray newRefractRay(internal_origin, internal_refract_direction);
+          refractColor = getRayColor(newRefractRay, background, new_maxHit, nullptr);
+          return refractColor;
+        } else {
+          vec3 reflect_origin = hit.pHit + hit.pNormal*0.01f;
+          vec3 reflect_direction = getReflectionAngle(ray.direction, hit.pNormal);
+          Ray reflectRay(reflect_origin, reflect_direction);
+          vec3 reflectColor;
+          reflectColor = getRayColor(reflectRay, background, new_maxHit, nullptr);
+          return reflectColor;
+        }
       } else {
         cout << "dfd" << endl;
-        Ray forwardRay = Ray(hit.pHit + ray.direction*0.01f, ray.direction);
+        Ray forwardRay(hit.pHit + ray.direction*0.01f, ray.direction);
         col = getRayColor(forwardRay, background, maxHit, tMat);
       }
     } else {
@@ -259,12 +294,13 @@ double RayTrace::getAntiSampleRate() {
 }
 
 glm::vec3 RayTrace::getRefractAngle(glm::vec3 direction, glm::vec3 normal, float kr) {
-  assert(abs(glm::dot(normal, normal) - 1.0f) < 0.00001);
-  assert(abs(glm::dot(direction, direction) - 1.0f) < 0.00001);
+  // assert(abs(glm::dot(normal, normal) - 1.0f) < 0.00001);
+  // assert(abs(glm::dot(direction, direction) - 1.0f) < 0.00001);
   float d_dot_n = glm::dot((direction), (normal));
   float root = 1.0f - kr*kr*(1.0f - d_dot_n*d_dot_n);
   if (root < 0) {
-    assert(false);
+    return getReflectionAngle(direction, normal);
+    // assert(false);
   }
   vec3 res = (-kr * d_dot_n - sqrt(root)) * (normal) + kr * (direction);
   return res;

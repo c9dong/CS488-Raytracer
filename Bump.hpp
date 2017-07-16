@@ -10,7 +10,7 @@ public:
   Bump(const std::string & file_name);
   virtual ~Bump();
 
-  glm::vec3 getNormal(glm::vec3 normal, float u, float v);
+  virtual glm::vec3 getNormal(glm::vec3 normal, float u, float v);
   glm::vec3 colorAt(int x, int y);
 
   std::vector<unsigned char> *image;

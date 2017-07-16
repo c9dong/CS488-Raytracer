@@ -12,7 +12,7 @@ glm::vec3 Shadow::getColor(Intersection::Hit hit, Light *light, SceneNode *root)
   Ray shadowRay(shadow_origin, shadow_direction);
   vec3 color = vec3(0);
   Intersection *intersect = root->intersect(shadowRay, true, mat4(1));
-  Intersection::Hit shadow_hit = intersect->getFirstHit(shadowRay);
+  Intersection::Hit shadow_hit = intersect->getFirstHit(shadowRay, true);
   delete intersect;
   if (shadow_hit.hit) {
     float light_dist = glm::distance(light->position, shadowRay.origin);

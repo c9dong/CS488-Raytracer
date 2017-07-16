@@ -15,24 +15,18 @@ Intersection* UnionNode::intersect(Ray & ray, bool checkBound, glm::mat4 lastInv
   vec3 inv_direction = glm::normalize(vec3(invtrans * vec4(ray.direction, 0)));
   Ray inverseRay(inv_origin, inv_direction);
   
-  assert (children.size() == 2);
-  Intersection *left;
-  Intersection *right;
-  int i = 0;
+  Intersection *total = new Intersection();
   for (SceneNode *child : children) {
-    if (i == 0) {
-      left = child->intersect(inverseRay, checkBound, invtrans * lastInv);
-    } else {
-      right = child->intersect(inverseRay, checkBound, invtrans * lastInv);
-    }
-    i ++;
+    Intersection *i = child->intersect(inverseRay, checkBound, invtrans * lastInv);
+    Intersection *temp = total;
+    // default union
+    total = temp->union_intersection(i);
+
+    delete i;
+    delete temp;
   }
 
-  Intersection *intersection = left->union_intersection(right);
-  intersection->transformRanges(ray, inverseRay, trans, invtrans);
+  total->transformRanges(ray, inverseRay, trans, invtrans);
 
-  delete left;
-  delete right;
-  
-  return intersection;
+  return total;
 }

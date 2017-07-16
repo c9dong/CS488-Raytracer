@@ -35,7 +35,12 @@ public:
     double camera_radius,
     double camera_sample_rate,
     double anti_sample_radius,
-    double anti_sample_rate);
+    double anti_sample_rate,
+    int x_start,
+    int y_start,
+    int x_size,
+    int y_size,
+    int id);
 
   virtual ~RayTrace();
 
@@ -49,7 +54,13 @@ public:
   double getAntiSampleRate();
 
   glm::vec3 getBackgroundColor(Ray &ray);
-  glm::vec3 getRayColor(Ray & ray, glm::vec3 & background, int maxHit, Material *lastMat);
+  glm::vec3 getRayColor(Ray &ray, glm::vec3 & background, int maxHit, Material *lastMat);
+
+  int x_start;
+  int y_start;
+  int x_size;
+  int y_size;
+  int id;
 private:
   // Member functions
   glm::mat4 getPointToWorldMatrix();

@@ -108,6 +108,15 @@ struct gr_light_ud {
   Light* light;
 };
 
+static int X_START;
+static int Y_START;
+static int X_SIZE;
+static int Y_SIZE;
+static int ID;
+static int WIDTH;
+static int HEIGHT;
+static string RESULTNAME;
+
 // Useful function to retrieve and check an n-tuple of numbers.
 template<typename T>
 void get_tuple(lua_State* L, int arg, T* data, int n)
@@ -466,9 +475,26 @@ int gr_render_cmd(lua_State* L)
   double anti_sample_rad = luaL_checknumber(L, 14);
   double anti_sample_rate = luaL_checknumber(L, 15);
 
-	Image im( width, height);
-	A4_Render(root->node, im, eye, view, up, fov, ambient, lights, focal_dist, camera_rad, camera_sample_rate, anti_sample_rad, anti_sample_rate);
-    im.savePng( filename );
+	Image im( WIDTH, HEIGHT);
+	A4_Render(root->node, 
+    im, 
+    eye, 
+    view, 
+    up, 
+    fov, 
+    ambient, 
+    lights, 
+    focal_dist, 
+    camera_rad, 
+    camera_sample_rate, 
+    anti_sample_rad, 
+    anti_sample_rate,
+    X_START,
+    Y_START,
+    X_SIZE,
+    Y_SIZE,
+    ID);
+    im.savePng( RESULTNAME.c_str() );
 
 	return 0;
 }
@@ -769,8 +795,16 @@ static const luaL_Reg grlib_mat_methods[] = {
 
 // This function calls the lua interpreter to define the scene and
 // raytrace it as appropriate.
-bool run_lua(const std::string& filename)
+bool run_lua(const std::string& filename, const std::string& resultname, int x_start, int y_start, int x_size, int y_size, int id, int width, int height)
 {
+  X_START = x_start;
+  Y_START = y_start;
+  X_SIZE = x_size;
+  Y_SIZE = y_size;
+  ID = id;
+  RESULTNAME = resultname;
+  WIDTH = width;
+  HEIGHT = height;
   GRLUA_DEBUG("Importing scene from " << filename);
   
   // Start a lua interpreter

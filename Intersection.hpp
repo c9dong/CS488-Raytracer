@@ -87,7 +87,7 @@ public:
   Intersection* union_intersection(Intersection *other);
   Intersection* difference_intersection(Intersection *other);
 
-  Intersection::Hit getFirstHit(Ray &ray);
+  Intersection::Hit getFirstHit(Ray &ray, bool ignoreTrans);
   void transformRanges(Ray &ray, Ray &inv_ray, glm::mat4 trans, glm::mat4 invtrans);
 
 

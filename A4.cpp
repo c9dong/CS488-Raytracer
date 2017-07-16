@@ -153,7 +153,12 @@ void A4_Render(
 
 		// Antialiasing
     double anti_sample_radius,
-    double anti_sample_rate
+    double anti_sample_rate,
+    int x_start,
+    int y_start,
+    int x_size,
+    int y_size,
+    int id
 ) {
 
 	#ifdef TEST
@@ -181,7 +186,25 @@ void A4_Render(
 	std:: cout <<")" << std::endl;
 	
 	vec3 shadow_color = vec3(0.0f);
-	Shadow shadow(shadow_color);
-	RayTrace raytrace(root, image, eye, view, up, fovy, ambient, lights, shadow, focal_dist, camera_radius, camera_sample_rate, anti_sample_radius, anti_sample_rate);
+	NoShadow shadow(shadow_color);
+	RayTrace raytrace(root, 
+		image, 
+		eye, 
+		view, 
+		up, 
+		fovy, 
+		ambient, 
+		lights, 
+		shadow, 
+		focal_dist, 
+		camera_radius, 
+		camera_sample_rate, 
+		anti_sample_radius, 
+		anti_sample_rate,
+		x_start,
+		y_start,
+		x_size,
+		y_size,
+		id);
 	raytrace.generateImage();
 }

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include "TransparentMaterial.hpp"
 
 using namespace glm;
 using namespace std;
@@ -186,18 +187,19 @@ void Intersection::transformRanges(Ray &ray, Ray &inv_ray, glm::mat4 trans, glm:
   }
 }
 
-Intersection::Hit Intersection::getFirstHit(Ray &ray) {
+Intersection::Hit Intersection::getFirstHit(Ray &ray, bool ignoreTrans) {
   Intersection::Hit minHit;
   float minT = INFINITY;
+  TransparentMaterial *tMat;
   for (Range *r : ranges) {
-    if (r->start >= 0 && r->start < minT) {
+    if (r->start >= 0 && r->start < minT && !(ignoreTrans && (tMat = dynamic_cast<TransparentMaterial*>(r->s_mat)))) {
       minT = r->start;
       minHit.pNormal = r->s_normal;
       minHit.mat = r->s_mat;
       minHit.inv = r->s_inv;
     }
 
-    if (r->end >= 0 && r->end < minT) {
+    if (r->end >= 0 && r->end < minT  && !(ignoreTrans && (tMat = dynamic_cast<TransparentMaterial*>(r->e_mat)))) {
       minT = r->end;
       minHit.pNormal = r->e_normal;
       minHit.mat = r->e_mat;

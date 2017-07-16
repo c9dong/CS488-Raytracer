@@ -26,5 +26,10 @@ void A4_Render(
 		double camera_radius,
 		double camera_sample_rate,
 		double anti_sample_radius,
-    double anti_sample_rate
+    double anti_sample_rate,
+    int x_start,
+    int y_start,
+    int x_size,
+    int y_size,
+    int id
 );

@@ -14,25 +14,25 @@ Intersection* DifferenceNode::intersect(Ray & ray, bool checkBound, glm::mat4 la
   vec3 inv_origin = vec3(invtrans * vec4(ray.origin, 1));
   vec3 inv_direction = glm::normalize(vec3(invtrans * vec4(ray.direction, 0)));
   Ray inverseRay(inv_origin, inv_direction);
-  
-  assert (children.size() == 2);
-  Intersection *left;
-  Intersection *right;
+
+  Intersection *total;
   int i = 0;
   for (SceneNode *child : children) {
     if (i == 0) {
-      left = child->intersect(inverseRay, checkBound, invtrans * lastInv);
+      total = child->intersect(inverseRay, checkBound, invtrans * lastInv);
+      i++;
     } else {
-      right = child->intersect(inverseRay, checkBound, invtrans * lastInv);
+      Intersection *i = child->intersect(inverseRay, checkBound, invtrans * lastInv);
+      Intersection *temp = total;
+      // default union
+      total = temp->difference_intersection(i);
+
+      delete i;
+      delete temp;
     }
-    i ++;
   }
 
-  Intersection *intersection = left->difference_intersection(right);
-  intersection->transformRanges(ray, inverseRay, trans, invtrans);
+  total->transformRanges(ray, inverseRay, trans, invtrans);
 
-  delete left;
-  delete right;
-  
-  return intersection;
+  return total;
 }
