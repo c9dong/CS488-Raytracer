@@ -30,3 +30,11 @@ Intersection* UnionNode::intersect(Ray & ray, bool checkBound, glm::mat4 lastInv
 
   return total;
 }
+
+Primitive::BoundingBox* UnionNode::getBoundingBox() {
+  return SceneNode::getBoundingBox();
+}
+
+std::vector<SceneNode *>* UnionNode::intersectBox(Primitive::BoundingBox *box) {
+  return SceneNode::intersectBox(box);
+}

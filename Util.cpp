@@ -38,3 +38,29 @@ float randomNum(int dist) {
   float half = float(dist) / 2.0f;
   return float(rand() % ((dist) * 100000+1)) / 100000.0f - half;
 }
+
+float myfmod(float r, float d) {
+  int i = round(r / d);
+  if (abs((r / d) - i) < 0.000001) {
+    return 0;
+  }
+  return fmod(r, d);
+}
+
+float findNext(float n, float s, float l, float inc) {
+  if (isZero(n-s)) {
+    return s;
+  }
+  if (n < s) return INFINITY;
+  float t = (n - s) / inc;
+  int c = int(floor(t));
+
+  float final = s + c * inc;
+  if (final > l) {
+    return INFINITY;
+  }
+  if (n >= final - inc && n < final) {
+    return final - inc;
+  }
+  return final;
+}

@@ -134,6 +134,33 @@ Intersection* SceneNode::intersect(Ray &ray, bool checkBound, glm::mat4 lastInv)
 	return minIntersection;
 }
 
+Primitive::BoundingBox* SceneNode::getBoundingBox() {
+	Primitive::BoundingBox *box = new Primitive::BoundingBox();
+	for (SceneNode *child : children) {
+		Primitive::BoundingBox *other = child->getBoundingBox();
+		box->min_box.x = glm::min(box->min_box.x, other->min_box.x);
+		box->min_box.y = glm::min(box->min_box.y, other->min_box.y);
+		box->min_box.z = glm::min(box->min_box.z, other->min_box.z);
+		box->max_box.x = glm::max(box->max_box.x, other->max_box.x);
+		box->max_box.y = glm::max(box->max_box.y, other->max_box.y);
+		box->max_box.z = glm::max(box->max_box.z, other->max_box.z);
+
+		delete other;
+	}
+	return box;
+}
+
+std::vector<SceneNode *>* SceneNode::intersectBox(Primitive::BoundingBox *box) {
+	vector<SceneNode *>* nodes = new vector<SceneNode *>();
+	for (SceneNode *child : children) {
+		vector<SceneNode *>* other = child->intersectBox(box);
+		for (SceneNode *n : *other) {
+			nodes->push_back(n);
+		}
+	}
+	return nodes;
+}
+
 //---------------------------------------------------------------------------------------
 std::ostream & operator << (std::ostream & os, const SceneNode & node) {
 

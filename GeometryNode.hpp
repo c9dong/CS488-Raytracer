@@ -12,6 +12,8 @@ public:
 	void setMaterial( Material *material );
 
   Intersection* intersect(Ray & ray, bool checkBound, glm::mat4 lastInv);
+  Primitive::BoundingBox* getBoundingBox();
+  std::vector<SceneNode *>* intersectBox(Primitive::BoundingBox *box);
 
 	Material *m_material;
 	Primitive *m_primitive;

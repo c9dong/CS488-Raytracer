@@ -36,3 +36,11 @@ Intersection* IntersectNode::intersect(Ray & ray, bool checkBound, glm::mat4 las
   
   return intersection;
 }
+
+Primitive::BoundingBox* IntersectNode::getBoundingBox() {
+  return SceneNode::getBoundingBox();
+}
+
+std::vector<SceneNode *>* IntersectNode::intersectBox(Primitive::BoundingBox *box) {
+  return SceneNode::intersectBox(box);
+}

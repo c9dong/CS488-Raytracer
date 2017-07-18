@@ -10,6 +10,7 @@
 
 #include "Ray.hpp"
 #include "Intersection.hpp"
+#include "Primitive.hpp"
 
 enum class NodeType {
 	SceneNode,
@@ -45,6 +46,8 @@ public:
     void translate(const glm::vec3& amount);
 
     virtual Intersection* intersect(Ray &ray, bool checkBound, glm::mat4 lastInv);
+    virtual Primitive::BoundingBox* getBoundingBox();
+    virtual std::vector<SceneNode *>* intersectBox(Primitive::BoundingBox *box);
 
 
 	friend std::ostream & operator << (std::ostream & os, const SceneNode & node);

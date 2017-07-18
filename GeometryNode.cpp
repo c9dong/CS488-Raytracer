@@ -51,3 +51,38 @@ Intersection* GeometryNode::intersect(Ray &ray, bool checkBound, glm::mat4 lastI
 
 	return i;
 }
+
+Primitive::BoundingBox* GeometryNode::getBoundingBox() {
+	return m_primitive->getBoundingBox();
+}
+
+std::vector<SceneNode *>* GeometryNode::intersectBox(Primitive::BoundingBox *box) {
+	vector<SceneNode *>* a = new vector<SceneNode *>();
+	Primitive::BoundingBox *b_box = m_primitive->getBoundingBox();
+	bool hasX = false;
+	bool hasY = false;
+	bool hasZ = false;
+	if (b_box->min_box.x >= box->min_box.x && b_box->min_box.x <= box->max_box.x) {
+		hasX = true;
+	}
+	if (b_box->max_box.x >= box->min_box.x && b_box->max_box.x <= box->max_box.x) {
+		hasX = true;
+	}
+	if (b_box->min_box.y >= box->min_box.y && b_box->min_box.y <= box->max_box.y) {
+		hasY = true;
+	}
+	if (b_box->max_box.y >= box->min_box.y && b_box->max_box.y <= box->max_box.y) {
+		hasY = true;
+	}
+	if (b_box->min_box.z >= box->min_box.z && b_box->min_box.z <= box->max_box.z) {
+		hasZ = true;
+	}
+	if (b_box->max_box.z >= box->min_box.z && b_box->max_box.z <= box->max_box.z) {
+		hasZ = true;
+	}
+	if (hasX && hasY && hasZ) {
+		// cout << m_name << " intersect in " << box->min_box.x << " " << box->min_box.y << " " << box->min_box.z << endl;
+		a->push_back(this);
+	}
+  return a;
+}

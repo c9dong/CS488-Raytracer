@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Clean Blog</title>
+    <title>Raytracer | Cheng Dong</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -60,7 +60,7 @@
                         Objective 1: Primitives
                     </h2>
                     <h3 class="post-subtitle">
-                        Implemented cones and cylinders
+                        Implemented cones and cylinders.
                     </h3>
                     <img src="img/primitive.png"/>
                 </div>
@@ -71,7 +71,7 @@
                         Objective 2: Refraction
                     </h2>
                     <h3 class="post-subtitle">
-                        Implemented refraction
+                        Implemented refraction.
                     </h3>
                     <img src="img/refraction.png"/>
                 </div>
@@ -82,7 +82,7 @@
                         Objective 3: Texture Mapping
                     </h2>
                     <h3 class="post-subtitle">
-                        Implemented texture mapping for spheres and cubes
+                        Implemented texture mapping for spheres and cubes.
                     </h3>
                     <img src="img/texture.png"/>
                 </div>
@@ -93,7 +93,7 @@
                         Objective 4: Bump Mapping
                     </h2>
                     <h3 class="post-subtitle">
-                        Implemented bump mapping for spheres
+                        Implemented bump mapping for spheres.
                     </h3>
                     <img src="img/bump0.png"/>
                     <img src="img/bump1.png"/>
@@ -105,7 +105,7 @@
                         Objective 6: Antialiasing
                     </h2>
                     <h3 class="post-subtitle">
-                        Implemented antialiasing with grid supersampling
+                        Implemented antialiasing using grid supersampling. The left image shows a scene without antialiasing. The right image shows the same scene using antialiasing.
                     </h3>
                     <img src="img/noantialiasing.png"/>
                     <img src="img/antialiasing.png"/>
@@ -117,7 +117,7 @@
                         Objective 7: Soft Shadow
                     </h2>
                     <h3 class="post-subtitle">
-                        Implemented soft shadow by sampling an area light
+                        Implemented soft shadow by sampling an area light. The multiple images shows the result of increasing the size of the area light.
                     </h3>
                     <img src="img/softshadow0.png"/>
                     <img src="img/softshadow1.png"/>
@@ -130,7 +130,7 @@
                         Objective 8: Constructive Solid Geometry
                     </h2>
                     <h3 class="post-subtitle">
-                        Implemented CSG union, intersect, and difference for all primitives
+                        Implemented CSG union, intersect, and difference for all primitives.
                     </h3>
                     <img src="img/csg.png"/>
                 </div>
@@ -141,7 +141,7 @@
                         Objective 9: Depth of Field
                     </h2>
                     <h3 class="post-subtitle">
-                        Implemented depth of field using an area lens
+                        Implemented depth of field using an area lens camera. Each image shows the camera with a different focal point.
                     </h3>
                     <img src="img/depth0.png"/>
                     <img src="img/depth1.png"/>
@@ -155,7 +155,7 @@
                         Objective 5: Final Scene
                     </h2>
                     <h3 class="post-subtitle">
-                        Final scene created using texture mapping, antialiasing, soft shadows, csg, refraction, and new primitives
+                        Final scene created using texture mapping, antialiasing, soft shadows, csg, refraction, and new primitives. It models my room, with some extra creativity thrown in.
                     </h3>
                     <img src="img/final.png"/>
                 </div>
@@ -166,9 +166,10 @@
                         Objective 10: Grid Acceleration
                     </h2>
                     <h3 class="post-subtitle">
-                        Implemented grid acceleration
+                        Implemented grid acceleration by spliting the world into n by n by n cubes, and intersect with only cubes that the ray intersects with. From the chart, as the size of the cube increases, more objects are contained within it, therefore the time to render the scene increases.
                     </h3>
                     <img src="img/grid.png"/>
+                    <img src="img/grid_chart.png"/>
                 </div>
                 <!-- Extra Obj 1 -->
                 <div class="post-preview">
@@ -176,7 +177,7 @@
                         Extra Objective 1: Multi-threaded Raytracing
                     </h2>
                     <h3 class="post-subtitle">
-                        Split image into n by n squares and raytraced each square concurrently
+                        Split image into n by n squares and raytraced each square concurrently. From the chart, as the number of thread increases, time taken to render the scene decreases, however, speed up become less and less noticable as number of thread increases.
                     </h3>
                     <img src="img/thread.png"/>
                     <img src="img/thread_chart.png"/>
@@ -189,39 +190,6 @@
 
     <!-- Footer -->
     <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                    <ul class="list-inline text-center">
-                        <li>
-                            <a href="#">
-                                <span class="fa-stack fa-lg">
-                                    <i class="fa fa-circle fa-stack-2x"></i>
-                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <span class="fa-stack fa-lg">
-                                    <i class="fa fa-circle fa-stack-2x"></i>
-                                    <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <span class="fa-stack fa-lg">
-                                    <i class="fa fa-circle fa-stack-2x"></i>
-                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                    <p class="copyright text-muted">Copyright &copy; Your Website 2016</p>
-                </div>
-            </div>
-        </div>
     </footer>
 
     <!-- jQuery -->

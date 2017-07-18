@@ -186,7 +186,7 @@ void A4_Render(
 	std:: cout <<")" << std::endl;
 	
 	vec3 shadow_color = vec3(0.0f);
-	Shadow shadow(shadow_color);
+	NoShadow shadow(shadow_color);
 	RayTrace raytrace(root, 
 		image, 
 		eye, 

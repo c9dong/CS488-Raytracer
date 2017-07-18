@@ -16,6 +16,8 @@ using namespace glm;
 using namespace std;
 
 #define NUM_THREAD_ROOT_2 4
+// #define GRID_OPT
+#define GRID_RESOLUTION 1
 
 RayTrace::RayTrace(
     SceneNode * root,
@@ -62,6 +64,7 @@ RayTrace::RayTrace(
 
 RayTrace::~RayTrace() {}
 
+static bool print = false;
 void createImagePart(void *arguments) {
   RayTrace::GenerateArg *arg = (RayTrace::GenerateArg *)arguments;
   int x_start = arg->x_start;
@@ -78,7 +81,8 @@ void createImagePart(void *arguments) {
 
   for (int x=x_start; x<std::min(x_start+x_size, x_max); x++) {
     for (int y=y_start; y<std::min(y_start+y_size, y_max); y++) {
-      cout << x << " " << y << endl;
+      // cout << x << " " << y << endl;
+      // if (x == 125 && y == 200) print = true;
       vec3 col = vec3(0);
       for (float x_delta=-anti_sample_radius; x_delta<=anti_sample_radius; x_delta+=anti_sample_rate) {
         for (float y_delta=-anti_sample_radius; y_delta<=anti_sample_radius; y_delta+=anti_sample_rate) {
@@ -124,9 +128,14 @@ void createImagePart(void *arguments) {
       raytrace->getImage()(x, y, 0) = col.r;
       raytrace->getImage()(x, y, 1) = col.g;
       raytrace->getImage()(x, y, 2) = col.b;
+      if (print) {
+        raytrace->getImage()(x, y, 0) = 0;
+        raytrace->getImage()(x, y, 1) = 0;
+        raytrace->getImage()(x, y, 2) = 0;
+        print = false;
+      }
     }
   }
-  // pthread_exit(NULL);
 }
 
 Image& RayTrace::getImage() {
@@ -144,6 +153,10 @@ const glm::vec3& RayTrace::getEye() {
 }
 
 void RayTrace::generateImage() {
+  #ifdef GRID_OPT
+  cout << "GRID OPTIMIZATION" << endl;
+  generateGrid();
+  #endif
   size_t h = image.height();
   size_t w = image.width();
 
@@ -160,37 +173,120 @@ void RayTrace::generateImage() {
   args->raytrace = this;
 
   createImagePart((void *)args);
+}
 
+void RayTrace::generateGrid() {
+  world_box = root->getBoundingBox();
+  // printVec3(world_box->min_box);
+  // printVec3(world_box->max_box);
+  int i = -1;
+  int j = -1;
+  int k = -1;
+  grid = new std::vector< std::vector<std::vector<std::vector<SceneNode *>* >* >* >();
+  for (float x = world_box->min_box.x; x < world_box->max_box.x + GRID_RESOLUTION; x += GRID_RESOLUTION) {
+    i++;
+    // cout << "x: " << i << endl;
+    grid->push_back(new std::vector<std::vector<std::vector<SceneNode *>* >* >());
+    for (float y = world_box->min_box.y; y < world_box->max_box.y + GRID_RESOLUTION; y += GRID_RESOLUTION) {
+      j++;
+      // cout << "y: " << j << endl;
+      (*grid)[i]->push_back(new std::vector<std::vector<SceneNode *>* >());
+      for (float z = world_box->min_box.z; z < world_box->max_box.z + GRID_RESOLUTION; z += GRID_RESOLUTION) {
+        k++;
+        // cout << "z: " << k << endl;
+        vec3 c_min = vec3(x, y, z);
+        vec3 c_max = vec3(x+GRID_RESOLUTION, y+GRID_RESOLUTION, z+GRID_RESOLUTION);
+        Primitive::BoundingBox *c_box = new Primitive::BoundingBox(c_min, c_max);
+        vector<SceneNode *> *nodes = root->intersectBox(c_box);
+        (*(*grid)[i])[j]->push_back(nodes);
+        delete c_box;
+      }
+      k = -1;
+    }  
+    j = -1;
+  }
+  i = -1;
+}
 
-  // int h_size = int(ceil(float(h) / NUM_THREAD_ROOT_2));
-  // int w_size = int(ceil(float(w) / NUM_THREAD_ROOT_2));
+Intersection* RayTrace::intersect(Ray &ray) {
+  float signx = sign(ray.direction.x);
+  float signy = sign(ray.direction.y);
+  float signz = -sign(ray.direction.z);
+  float bx = world_box->min_box.x;
+  float by = world_box->min_box.y;
+  float bz = world_box->min_box.z;
+  float tx = (bx - ray.origin.x) / ray.direction.x;
+  if (tx < 0) {
+    tx = (world_box->max_box.x - ray.origin.x) / ray.direction.x;
+  }
+  float ty = (by - ray.origin.y) / ray.direction.y;
+  if (ty < 0) {
+    ty = (world_box->max_box.y - ray.origin.y) / ray.direction.y;
+  }
+  float tz = (bz - ray.origin.z) / ray.direction.z;
+  if (tz < 0) {
+    tz = (world_box->max_box.z - ray.origin.z) / ray.direction.z;
+  }
+  float t = min3(tx, ty, tz);
 
-  // pthread_t threads[NUM_THREAD_ROOT_2 * NUM_THREAD_ROOT_2];
-  // for (int i=0; i<NUM_THREAD_ROOT_2; i++) {
-  //   for (int j=0; j<NUM_THREAD_ROOT_2; j++) {
-  //     GenerateArg *args = new GenerateArg();
-  //     args->x_start = i * w_size;
-  //     args->x_size = w_size;
-  //     args->x_max = int(w);
-  //     args->y_start = j * h_size;
-  //     args->y_size = h_size;
-  //     args->y_max = int(h);
-  //     args->world_mat = p_to_world;
-  //     args->raytrace = this;
+  vec3 p = ray.origin + ray.direction * t;
+  float xs = findNext(p.x, world_box->min_box.x, world_box->max_box.x, GRID_RESOLUTION);
+  float ys = findNext(p.y, world_box->min_box.y, world_box->max_box.y, GRID_RESOLUTION);
+  float zs = findNext(p.z, world_box->min_box.z, world_box->max_box.z, GRID_RESOLUTION);
 
-  //     createImagePart((void *)args);
+  Intersection *total = new Intersection();
+  while ((xs >= world_box->min_box.x && xs <= world_box->max_box.x) &&
+          (ys >= world_box->min_box.y && ys <= world_box->max_box.y) &&
+          (zs >= world_box->min_box.z && zs <= world_box->max_box.z)) {
+    int x = int((xs - world_box->min_box.x) / GRID_RESOLUTION);
+    int y = int((ys - world_box->min_box.y) / GRID_RESOLUTION);
+    int z = int((zs - world_box->min_box.z) / GRID_RESOLUTION);
 
-  //     // int rc = pthread_create(&threads[i*NUM_THREAD_ROOT_2+j], NULL, createImagePart, (void *)args);
-  //     // if (rc){
-  //     //    cout << "Error:unable to create thread," << rc << endl;
-  //     //    exit(-1);
-  //     // }
-  //     delete args;
+    vector<SceneNode *> *nodes = (*(*(*grid)[x])[y])[z];
+    for (SceneNode *n : *nodes) {
+      Intersection *i = n->intersect(ray, false, mat4(1));
+      Intersection *temp = total;
+      // default union
+      total = temp->union_intersection(i);
+
+      delete i;
+      delete temp;
+    }
+
+    tx = (xs + GRID_RESOLUTION * signx - ray.origin.x) / ray.direction.x;
+    if (tx < 0) tx = INFINITY;
+    ty = (ys + GRID_RESOLUTION * signy - ray.origin.y) / ray.direction.y;
+    if (ty < 0) ty = INFINITY;
+    tz = (zs + GRID_RESOLUTION * signz - ray.origin.z) / ray.direction.z;
+    if (tz < 0) tz = INFINITY;
+    t = min3(tx, ty, tz);
+    if (t == INFINITY) {
+      break;
+    }
+
+    p = ray.origin + ray.direction * t;
+    xs = findNext(p.x, world_box->min_box.x, world_box->max_box.x, GRID_RESOLUTION);
+    ys = findNext(p.y, world_box->min_box.y, world_box->max_box.y, GRID_RESOLUTION);
+    zs = findNext(p.z, world_box->min_box.z, world_box->max_box.z, GRID_RESOLUTION);
+  }
+
+  // for (std::vector<std::vector<std::vector<SceneNode *>* >* > *v1 : *grid) {
+  //   for (std::vector<std::vector<SceneNode *>* > *v2 : *v1) {
+  //     for (std::vector<SceneNode *> *v3 : *v2) {
+  //       for (SceneNode *n : *v3) {
+  //         Intersection *i = n->intersect(ray, false, mat4(1));
+  //         Intersection *temp = total;
+  //         // default union
+  //         total = temp->union_intersection(i);
+
+  //         delete i;
+  //         delete temp;
+  //       }
+  //     }
   //   }
   // }
-  // for (int i=0; i<NUM_THREAD_ROOT_2*NUM_THREAD_ROOT_2; i++) {
-  //   pthread_join(threads[i], NULL);
-  // }
+
+  return total;
 }
 
 mat4 RayTrace::getPointToWorldMatrix() {
@@ -223,7 +319,12 @@ mat4 RayTrace::getPointToWorldMatrix() {
 }
 
 glm::vec3 RayTrace::getRayColor(Ray &ray, glm::vec3 & background, int maxHit, Material *lastMat) {
+  #ifdef GRID_OPT
+  Intersection *intersection = intersect(ray);
+  #endif
+  #ifndef GRID_OPT
   Intersection *intersection = root->intersect(ray, false, mat4(1));
+  #endif
   vec3 col;
   Intersection::Hit hit = intersection->getFirstHit(ray, false);
   delete intersection;

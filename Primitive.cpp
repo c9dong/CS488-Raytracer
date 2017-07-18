@@ -15,6 +15,10 @@ Intersection::Range* Primitive::intersect(Ray &ray, bool checkBound) {
   return new Intersection::Range();
 }
 
+Primitive::BoundingBox* Primitive::getBoundingBox() {
+  return new Primitive::BoundingBox();
+}
+
 Sphere::~Sphere()
 {
 }
@@ -22,6 +26,10 @@ Sphere::~Sphere()
 Intersection::Range* Sphere::intersect(Ray &ray, bool checkBound) {
   NonhierSphere s(vec3(0,0,0), 1);
   return s.intersect(ray, checkBound);
+}
+
+Primitive::BoundingBox* Sphere::getBoundingBox() {
+  return new Primitive::BoundingBox();
 }
 
 Cube::~Cube()
@@ -33,6 +41,10 @@ Intersection::Range* Cube::intersect(Ray &ray, bool checkBound) {
   return b.intersect(ray, checkBound);
 }
 
+Primitive::BoundingBox* Cube::getBoundingBox() {
+  return new Primitive::BoundingBox();
+}
+
 Cone::~Cone()
 {
 }
@@ -42,6 +54,10 @@ Intersection::Range* Cone::intersect(Ray &ray, bool checkBound) {
   return c.intersect(ray, checkBound);
 }
 
+Primitive::BoundingBox* Cone::getBoundingBox() {
+  return new Primitive::BoundingBox();
+}
+
 Cylinder::~Cylinder()
 {
 }
@@ -49,6 +65,10 @@ Cylinder::~Cylinder()
 Intersection::Range* Cylinder::intersect(Ray &ray, bool checkBound) {
   NonhierCylinder c(vec3(0,0,0), 1, 1);
   return c.intersect(ray, checkBound);
+}
+
+Primitive::BoundingBox* Cylinder::getBoundingBox() {
+  return new Primitive::BoundingBox();
 }
 
 NonhierSphere::~NonhierSphere()
@@ -90,6 +110,10 @@ Intersection::Range* NonhierSphere::intersect(Ray &ray, bool checkBound) {
   r->hit = true;
 
   return r;
+}
+
+Primitive::BoundingBox* NonhierSphere::getBoundingBox() {
+  return new Primitive::BoundingBox();
 }
 
 NonhierBox::~NonhierBox()
@@ -218,6 +242,13 @@ Intersection::Range* NonhierBox::intersect(Ray &ray, bool checkBound) {
   return range;
 }
 
+Primitive::BoundingBox* NonhierBox::getBoundingBox() {
+  float r = m_size;
+  vec3 bound_min = vec3(m_pos.x-r/2, m_pos.y-r/2, m_pos.z-r/2);
+  vec3 bound_max = vec3(m_pos.x+r/2, m_pos.y+r/2, m_pos.z+r/2);
+  return new Primitive::BoundingBox(bound_min, bound_max);
+}
+
 NonhierCylinder::~NonhierCylinder() {
 
 }
@@ -342,6 +373,10 @@ Intersection::Range* NonhierCylinder::intersect(Ray &ray, bool checkBound) {
   return range;
 }
 
+Primitive::BoundingBox* NonhierCylinder::getBoundingBox() {
+  return new Primitive::BoundingBox();
+}
+
 NonhierCone::~NonhierCone() {
 
 }
@@ -451,4 +486,8 @@ Intersection::Range* NonhierCone::intersect(Ray &ray, bool checkBound) {
   range->e_normal = -pNormalMaxTotal;
   range->hit = true;
   return range;
+}
+
+Primitive::BoundingBox* NonhierCone::getBoundingBox() {
+  return new Primitive::BoundingBox();
 }

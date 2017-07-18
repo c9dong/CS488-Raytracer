@@ -55,6 +55,7 @@ public:
 
   glm::vec3 getBackgroundColor(Ray &ray);
   glm::vec3 getRayColor(Ray &ray, glm::vec3 & background, int maxHit, Material *lastMat);
+  Intersection* intersect(Ray &ray);
 
   int x_start;
   int y_start;
@@ -66,6 +67,7 @@ private:
   glm::mat4 getPointToWorldMatrix();
   glm::vec3 getRefractAngle(glm::vec3 direction, glm::vec3 normal, float kr);
   glm::vec3 getReflectionAngle(glm::vec3 direction, glm::vec3 normal);
+  void generateGrid();
   // Member variables
   SceneNode * root;
   Image & image;
@@ -82,4 +84,7 @@ private:
   double anti_sample_rate;
 
   Shadow &shadow;
+
+  Primitive::BoundingBox *world_box;
+  std::vector< std::vector<std::vector<std::vector<SceneNode *>* >* >* > *grid;
 };
